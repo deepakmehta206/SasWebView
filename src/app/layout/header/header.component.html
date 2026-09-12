@@ -1,0 +1,49 @@
+<header class="header">
+  <div class="header__left">
+    <button
+      type="button"
+      class="header__menu-btn"
+      (click)="onMenuClick()"
+      [attr.aria-expanded]="sidebarOpen"
+      aria-controls="app-sidebar"
+      aria-label="Toggle navigation menu"
+    >
+      <span class="header__menu-icon" aria-hidden="true"></span>
+    </button>
+
+    <div class="header__brand">
+      <span class="header__logo" aria-hidden="true">SP</span>
+      <span class="header__app-name">{{ appName }}</span>
+    </div>
+
+    <div class="header__divider" aria-hidden="true"></div>
+    <h1 class="header__page-title">{{ pageTitle }}</h1>
+  </div>
+
+  <div class="header__right">
+    <app-branch-selector />
+
+    <div class="header__user">
+      <button
+        type="button"
+        class="header__profile"
+        (click)="toggleUserMenu()"
+        [attr.aria-expanded]="menuOpen()"
+        aria-haspopup="menu"
+      >
+        <span class="header__avatar" aria-hidden="true">
+          {{ (authState.displayName() || 'U').charAt(0).toUpperCase() }}
+        </span>
+        <span class="header__profile-label">{{ authState.displayName() || 'User' }}</span>
+      </button>
+
+      @if (menuOpen()) {
+        <div class="header__dropdown" role="menu">
+          <a routerLink="/profile" role="menuitem" (click)="closeUserMenu()">Profile</a>
+          <a routerLink="/change-password" role="menuitem" (click)="closeUserMenu()">Change password</a>
+          <button type="button" role="menuitem" (click)="logout()">Logout</button>
+        </div>
+      }
+    </div>
+  </div>
+</header>

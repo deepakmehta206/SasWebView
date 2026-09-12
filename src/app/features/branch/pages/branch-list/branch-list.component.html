@@ -1,0 +1,108 @@
+<section class="branch-list">
+  <app-page-header title="Branches" subtitle="Manage branches for the current tenant.">
+    <a class="btn btn--primary" routerLink="/settings/branches/new">Add branch</a>
+  </app-page-header>
+
+  <app-ui-card title="Branch list">
+    <div class="branch-list__filters">
+      <label class="form-field">
+        <span class="form-label">Search</span>
+        <input
+          class="form-input"
+          type="search"
+          [formControl]="searchControl"
+          placeholder="Code, name, city…"
+        />
+      </label>
+
+      <label class="form-field">
+        <span class="form-label">Status</span>
+        <select class="form-input" [formControl]="statusControl">
+          <option value="all">All</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </label>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+    }
+    @if (successMessage()) {
+      <div class="alert alert--success" role="status">{{ successMessage() }}</div>
+    }
+
+    @if (loading()) {
+      <app-loading-indicator label="Loading branches…" />
+    } @else if (filteredBranches().length === 0) {
+      <app-empty-state
+        title="No branches found"
+        message="Try adjusting filters or add a new branch."
+      >
+        <a class="btn btn--secondary" routerLink="/settings/branches/new">Add branch</a>
+        <button type="button" class="btn btn--secondary" (click)="loadBranches()">Retry</button>
+      </app-empty-state>
+    } @else {
+      <div class="table-wrap" role="region" aria-label="Branches table">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th scope="col">Code</th>
+              <th scope="col">Name</th>
+              <th scope="col">Location</th>
+              <th scope="col">Status</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (branch of filteredBranches(); track branch.branchId) {
+              <tr>
+                <td>{{ branch.branchCode }}</td>
+                <td>{{ branch.branchName }}</td>
+                <td>
+                  {{ branch.city || '—' }}
+                  @if (branch.state || branch.country) {
+                    <span class="muted">
+                      ·
+                      {{ branch.state }}{{ branch.state && branch.country ? ', ' : '' }}{{ branch.country }}
+                    </span>
+                  }
+                </td>
+                <td>
+                  <span
+                    class="status-pill"
+                    [class.status-pill--active]="branch.isActive"
+                    [class.status-pill--inactive]="!branch.isActive"
+                  >
+                    {{ branch.status }}
+                  </span>
+                </td>
+                <td class="data-table__actions">
+                  <a
+                    class="btn btn--secondary btn--compact"
+                    [routerLink]="['/settings/branches', branch.branchId, 'edit']"
+                  >
+                    Edit
+                  </a>
+                  <button
+                    type="button"
+                    class="btn btn--secondary btn--compact"
+                    [disabled]="statusUpdatingId() === branch.branchId"
+                    (click)="toggleStatus(branch)"
+                  >
+                    {{ branch.isActive ? 'Deactivate' : 'Activate' }}
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <p class="table-footnote muted">
+        Showing {{ filteredBranches().length }} of {{ branches().length }} branches.
+        Server pagination will be wired when the API supports it.
+      </p>
+    }
+  </app-ui-card>
+</section>

@@ -1,0 +1,30 @@
+.tenant-profile {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+}
+
+.status-badge--active {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: var(--color-success);
+}
+
+.status-badge--inactive {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: var(--color-danger);
+}

@@ -1,0 +1,136 @@
+<section class="tenant-profile">
+  <app-page-header
+    title="Tenant profile"
+    subtitle="View and update the current tenant details."
+  >
+    @if (tenant(); as current) {
+      <span
+        class="status-badge"
+        [class.status-badge--active]="current.isActive"
+        [class.status-badge--inactive]="!current.isActive"
+      >
+        {{ current.status }}
+      </span>
+    }
+  </app-page-header>
+
+  @if (loading()) {
+    <app-loading-indicator label="Loading tenant…" />
+  } @else if (!tenant() && errorMessage()) {
+    <app-empty-state title="Tenant unavailable" [message]="errorMessage()!">
+      <button type="button" class="btn btn--secondary" (click)="loadTenant()">Retry</button>
+    </app-empty-state>
+  } @else {
+    <app-ui-card title="Tenant details" subtitle="Required fields are marked with *.">
+      @if (errorMessage()) {
+        <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+      }
+      @if (successMessage()) {
+        <div class="alert alert--success" role="status">{{ successMessage() }}</div>
+      }
+      @if (fieldErrors().length) {
+        <ul class="alert alert--danger alert--list" role="alert">
+          @for (item of fieldErrors(); track item.code + item.message) {
+            <li>{{ item.code }}: {{ item.message }}</li>
+          }
+        </ul>
+      }
+
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="save()" novalidate>
+        <label class="form-field">
+          <span class="form-label">Tenant code *</span>
+          <input class="form-input" type="text" formControlName="tenantCode" autocomplete="off" />
+          @if (controlError('tenantCode'); as message) {
+            <span class="form-error">{{ message }}</span>
+          }
+        </label>
+
+        <label class="form-field">
+          <span class="form-label">Tenant name *</span>
+          <input class="form-input" type="text" formControlName="tenantName" />
+          @if (controlError('tenantName'); as message) {
+            <span class="form-error">{{ message }}</span>
+          }
+        </label>
+
+        <label class="form-field">
+          <span class="form-label">Tenant type *</span>
+          <select class="form-input" formControlName="tenantType">
+            @for (type of tenantTypes; track type) {
+              <option [value]="type">{{ type }}</option>
+            }
+          </select>
+          @if (controlError('tenantType'); as message) {
+            <span class="form-error">{{ message }}</span>
+          }
+        </label>
+
+        <label class="form-field">
+          <span class="form-label">Status *</span>
+          <select class="form-input" formControlName="status">
+            @for (status of statusOptions; track status) {
+              <option [value]="status">{{ status }}</option>
+            }
+          </select>
+          @if (controlError('status'); as message) {
+            <span class="form-error">{{ message }}</span>
+          }
+        </label>
+
+        <label class="form-field">
+          <span class="form-label">Email</span>
+          <input class="form-input" type="email" formControlName="email" />
+          @if (controlError('email'); as message) {
+            <span class="form-error">{{ message }}</span>
+          }
+        </label>
+
+        <label class="form-field">
+          <span class="form-label">Phone</span>
+          <input class="form-input" type="text" formControlName="phone" />
+          @if (controlError('phone'); as message) {
+            <span class="form-error">{{ message }}</span>
+          }
+        </label>
+
+        <label class="form-field form-field--full">
+          <span class="form-label">Address</span>
+          <textarea class="form-input" rows="3" formControlName="address"></textarea>
+          @if (controlError('address'); as message) {
+            <span class="form-error">{{ message }}</span>
+          }
+        </label>
+
+        <label class="form-field">
+          <span class="form-label">Time zone</span>
+          <input class="form-input" type="text" formControlName="timeZone" placeholder="e.g. Asia/Kolkata" />
+          @if (controlError('timeZone'); as message) {
+            <span class="form-error">{{ message }}</span>
+          }
+        </label>
+
+        <label class="form-field">
+          <span class="form-label">Currency code</span>
+          <input class="form-input" type="text" formControlName="currencyCode" placeholder="e.g. INR" />
+          @if (controlError('currencyCode'); as message) {
+            <span class="form-error">{{ message }}</span>
+          }
+        </label>
+
+        <div class="form-actions form-field--full">
+          <button type="submit" class="btn btn--primary" [disabled]="saving()">
+            {{ saving() ? 'Saving…' : 'Save changes' }}
+          </button>
+          <button
+            type="button"
+            class="btn btn--secondary"
+            [disabled]="statusUpdating() || !tenant()"
+            (click)="toggleActive()"
+          >
+            {{ tenant()?.isActive ? 'Deactivate' : 'Activate' }}
+          </button>
+        </div>
+      </form>
+    </app-ui-card>
+  }
+</section>

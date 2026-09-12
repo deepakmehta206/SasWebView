@@ -1,0 +1,84 @@
+<section class="tenant-settings">
+  <app-page-header
+    title="Tenant settings"
+    subtitle="Simple key/value settings for the current tenant."
+  >
+    <button type="button" class="btn btn--secondary" (click)="startCreate()">Add setting</button>
+  </app-page-header>
+
+  @if (loading()) {
+    <app-loading-indicator label="Loading settings…" />
+  } @else if (errorMessage() && settings().length === 0) {
+    <app-empty-state title="Settings unavailable" [message]="errorMessage()!">
+      <button type="button" class="btn btn--secondary" (click)="loadSettings()">Retry</button>
+    </app-empty-state>
+  } @else {
+    <div class="tenant-settings__layout">
+      <app-ui-card title="Settings" subtitle="Select a key to edit.">
+        @if (settings().length === 0) {
+          <app-empty-state
+            title="No settings yet"
+            message="Add a setting key to get started."
+          />
+        } @else {
+          <ul class="settings-list">
+            @for (item of settings(); track item.tenantSettingId) {
+              <li>
+                <button
+                  type="button"
+                  class="settings-list__item"
+                  [class.settings-list__item--active]="selectedKey() === item.settingKey"
+                  (click)="selectSetting(item)"
+                >
+                  <span class="settings-list__key">{{ item.settingKey }}</span>
+                  <span class="settings-list__value">{{ item.settingValue || '—' }}</span>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </app-ui-card>
+
+      <app-ui-card title="Edit setting">
+        @if (errorMessage()) {
+          <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+        }
+        @if (successMessage()) {
+          <div class="alert alert--success" role="status">{{ successMessage() }}</div>
+        }
+
+        <form class="form-grid" [formGroup]="editForm" (ngSubmit)="save()" novalidate>
+          <label class="form-field form-field--full">
+            <span class="form-label">Setting key *</span>
+            <input class="form-input" type="text" formControlName="settingKey" autocomplete="off" />
+            @if (controlError('settingKey'); as message) {
+              <span class="form-error">{{ message }}</span>
+            }
+          </label>
+
+          <label class="form-field form-field--full">
+            <span class="form-label">Setting value</span>
+            <input class="form-input" type="text" formControlName="settingValue" />
+            @if (controlError('settingValue'); as message) {
+              <span class="form-error">{{ message }}</span>
+            }
+          </label>
+
+          <label class="form-field form-field--full">
+            <span class="form-label">Data type</span>
+            <input class="form-input" type="text" formControlName="dataType" placeholder="String" />
+            @if (controlError('dataType'); as message) {
+              <span class="form-error">{{ message }}</span>
+            }
+          </label>
+
+          <div class="form-actions form-field--full">
+            <button type="submit" class="btn btn--primary" [disabled]="saving()">
+              {{ saving() ? 'Saving…' : 'Save setting' }}
+            </button>
+          </div>
+        </form>
+      </app-ui-card>
+    </div>
+  }
+</section>

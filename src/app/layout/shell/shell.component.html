@@ -1,0 +1,21 @@
+<div class="shell" [class.shell--sidebar-open]="sidebarOpen">
+  <app-sidebar
+    [open]="sidebarOpen"
+    (navigate)="closeSidebar()"
+    (closeRequest)="closeSidebar()"
+  />
+
+  <div class="shell__main">
+    <app-header
+      [pageTitle]="pageTitle"
+      [sidebarOpen]="sidebarOpen"
+      (menuToggle)="toggleSidebar()"
+    />
+
+    <main class="shell__content" id="main-content" tabindex="-1">
+      <router-outlet />
+    </main>
+
+    <app-footer />
+  </div>
+</div>

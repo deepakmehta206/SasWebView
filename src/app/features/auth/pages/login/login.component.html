@@ -1,0 +1,54 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-card__brand">
+      <span class="auth-card__logo" aria-hidden="true">SP</span>
+      <h1>{{ appName }}</h1>
+      <p>Sign in to your tenant workspace.</p>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+    }
+
+    <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <label class="form-field">
+        <span class="form-label">Tenant code</span>
+        <input
+          class="form-input"
+          type="text"
+          formControlName="tenantCode"
+          autocomplete="organization"
+          autofocus
+        />
+      </label>
+
+      <label class="form-field">
+        <span class="form-label">Username</span>
+        <input class="form-input" type="text" formControlName="username" autocomplete="username" />
+      </label>
+
+      <label class="form-field">
+        <span class="form-label">Password</span>
+        <div class="password-field">
+          <input
+            class="form-input"
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            autocomplete="current-password"
+          />
+          <button type="button" class="password-field__toggle" (click)="togglePassword()">
+            {{ showPassword() ? 'Hide' : 'Show' }}
+          </button>
+        </div>
+      </label>
+
+      <button type="submit" class="btn btn--primary auth-form__submit" [disabled]="submitting()">
+        {{ submitting() ? 'Signing in…' : 'Sign in' }}
+      </button>
+    </form>
+
+    <p class="auth-card__footer">
+      <a routerLink="/forgot-password">Forgot password?</a>
+    </p>
+  </div>
+</div>

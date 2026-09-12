@@ -1,0 +1,54 @@
+<section class="role-permissions">
+  <app-page-header
+    [title]="role() ? ('Permissions — ' + role()!.roleName) : 'Role permissions'"
+    subtitle="Assign permissions using the union-from-roles catalog (UI only)."
+  >
+    <a class="btn btn--secondary" routerLink="/roles">Back</a>
+  </app-page-header>
+
+  @if (loading()) {
+    <app-loading-indicator label="Loading permissions…" />
+  } @else if (loadFailed()) {
+    <app-empty-state title="Permissions unavailable" [message]="errorMessage() || 'Unable to load.'" />
+  } @else {
+    <app-ui-card title="Permission matrix">
+      <p class="muted">
+        Catalog is derived from permissions already present on roles. Permissions never assigned to any
+        role may be missing until a role contains them.
+      </p>
+      @if (errorMessage()) { <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div> }
+      @if (successMessage()) { <div class="alert alert--success" role="status">{{ successMessage() }}</div> }
+      @if (role()?.isSystemRole) {
+        <div class="alert alert--danger" role="alert">System roles are locked.</div>
+      }
+
+      @for (group of grouped(); track group.moduleId) {
+        <div class="module-block">
+          <h3>Module {{ group.moduleId }}</h3>
+          <div class="perm-grid">
+            @for (permission of group.permissions; track permission.permissionId) {
+              <label class="perm-item">
+                <input
+                  type="checkbox"
+                  [checked]="isSelected(permission.permissionId)"
+                  [disabled]="!!role()?.isSystemRole"
+                  (change)="toggle(permission.permissionId, $any($event.target).checked)"
+                />
+                <span>
+                  <strong>{{ permission.permissionCode }}</strong>
+                  <small>{{ permission.permissionName }}</small>
+                </span>
+              </label>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="form-actions">
+        <button type="button" class="btn btn--primary" [disabled]="saving() || !!role()?.isSystemRole" (click)="save()">
+          {{ saving() ? 'Saving…' : 'Save permissions' }}
+        </button>
+      </div>
+    </app-ui-card>
+  }
+</section>

@@ -1,0 +1,16 @@
+<section class="settings-hub">
+  <app-page-header
+    title="Settings"
+    subtitle="Tenant and branch management for the current workspace."
+  />
+
+  <div class="settings-hub__grid">
+    @for (link of links; track link.route) {
+      <a class="settings-hub__link" [routerLink]="link.route">
+        <app-ui-card [title]="link.title">
+          <p>{{ link.description }}</p>
+        </app-ui-card>
+      </a>
+    }
+  </div>
+</section>

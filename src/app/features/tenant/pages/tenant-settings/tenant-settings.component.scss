@@ -1,0 +1,56 @@
+.tenant-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.tenant-settings__layout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.settings-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.settings-list__item {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  cursor: pointer;
+  text-align: left;
+}
+
+.settings-list__item:hover,
+.settings-list__item--active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.settings-list__key {
+  font-weight: 650;
+  color: var(--color-text);
+}
+
+.settings-list__value {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  word-break: break-word;
+}
+
+@media (min-width: 900px) {
+  .tenant-settings__layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  }
+}

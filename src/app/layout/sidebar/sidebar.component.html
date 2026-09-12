@@ -1,0 +1,54 @@
+<aside
+  id="app-sidebar"
+  class="sidebar"
+  [class.sidebar--open]="open"
+  aria-label="Main navigation"
+>
+  <div class="sidebar__brand">
+    <span class="sidebar__logo" aria-hidden="true">SP</span>
+    <div>
+      <div class="sidebar__title">{{ appName }}</div>
+      <div class="sidebar__subtitle">Enterprise console</div>
+    </div>
+  </div>
+
+  <nav class="sidebar__nav">
+    <ul class="sidebar__list">
+      @for (item of navItems(); track trackByLabel($index, item)) {
+        <li>
+          @if (item.enabled && item.route) {
+            <a
+              class="sidebar__link"
+              [routerLink]="item.route"
+              routerLinkActive="sidebar__link--active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              (click)="onEnabledNavigate()"
+            >
+              <span class="sidebar__icon" aria-hidden="true"></span>
+              <span>{{ item.label }}</span>
+            </a>
+          } @else {
+            <span
+              class="sidebar__link sidebar__link--disabled"
+              aria-disabled="true"
+              title="Coming in a later phase"
+            >
+              <span class="sidebar__icon" aria-hidden="true"></span>
+              <span>{{ item.label }}</span>
+              <span class="sidebar__badge">Soon</span>
+            </span>
+          }
+        </li>
+      }
+    </ul>
+  </nav>
+</aside>
+
+@if (open) {
+  <button
+    type="button"
+    class="sidebar-backdrop"
+    aria-label="Close navigation menu"
+    (click)="onClose()"
+  ></button>
+}

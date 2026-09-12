@@ -1,0 +1,23 @@
+<div class="branch-selector">
+  <label class="branch-selector__label" for="header-branch-select">Branch</label>
+  <select
+    id="header-branch-select"
+    class="branch-selector__select"
+    [disabled]="branchContext.loading() || branchContext.branches().length === 0"
+    [ngModel]="branchContext.selectedBranchId()"
+    (ngModelChange)="onBranchChange($event)"
+  >
+    @if (branchContext.loading()) {
+      <option [ngValue]="null">Loading…</option>
+    } @else if (branchContext.branches().length === 0) {
+      <option [ngValue]="null">No branches</option>
+    } @else {
+      <option [ngValue]="null">Select branch</option>
+      @for (branch of branchContext.branches(); track branch.branchId) {
+        <option [ngValue]="branch.branchId">
+          {{ branch.branchName }} ({{ branch.branchCode }})
+        </option>
+      }
+    }
+  </select>
+</div>

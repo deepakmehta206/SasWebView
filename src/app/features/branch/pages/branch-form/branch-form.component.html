@@ -1,0 +1,117 @@
+<section class="branch-form">
+  <app-page-header
+    [title]="isEdit() ? 'Edit branch' : 'Add branch'"
+    subtitle="Branch details for the current tenant."
+  >
+    <a class="btn btn--secondary" routerLink="/settings/branches">Back to list</a>
+  </app-page-header>
+
+  @if (loading()) {
+    <app-loading-indicator label="Loading branch…" />
+  } @else if (loadFailed()) {
+    <app-empty-state title="Branch unavailable" [message]="errorMessage() || 'Unable to load branch.'">
+      <a class="btn btn--secondary" routerLink="/settings/branches">Back to list</a>
+    </app-empty-state>
+  } @else {
+    <app-ui-card title="Branch details" subtitle="Required fields are marked with *.">
+      @if (errorMessage()) {
+        <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+      }
+      @if (successMessage()) {
+        <div class="alert alert--success" role="status">{{ successMessage() }}</div>
+      }
+      @if (fieldErrors().length) {
+        <ul class="alert alert--danger alert--list" role="alert">
+          @for (item of fieldErrors(); track item.code + item.message) {
+            <li>{{ item.code }}: {{ item.message }}</li>
+          }
+        </ul>
+      }
+
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="save()" novalidate>
+        <label class="form-field">
+          <span class="form-label">Branch code *</span>
+          <input class="form-input" type="text" formControlName="branchCode" autocomplete="off" />
+          @if (controlError('branchCode'); as message) {
+            <span class="form-error">{{ message }}</span>
+          }
+        </label>
+
+        <label class="form-field">
+          <span class="form-label">Branch name *</span>
+          <input class="form-input" type="text" formControlName="branchName" />
+          @if (controlError('branchName'); as message) {
+            <span class="form-error">{{ message }}</span>
+          }
+        </label>
+
+        <label class="form-field">
+          <span class="form-label">Email</span>
+          <input class="form-input" type="email" formControlName="email" />
+          @if (controlError('email'); as message) {
+            <span class="form-error">{{ message }}</span>
+          }
+        </label>
+
+        <label class="form-field">
+          <span class="form-label">Phone</span>
+          <input class="form-input" type="text" formControlName="phone" />
+          @if (controlError('phone'); as message) {
+            <span class="form-error">{{ message }}</span>
+          }
+        </label>
+
+        <label class="form-field form-field--full">
+          <span class="form-label">Address</span>
+          <textarea class="form-input" rows="3" formControlName="address"></textarea>
+          @if (controlError('address'); as message) {
+            <span class="form-error">{{ message }}</span>
+          }
+        </label>
+
+        <label class="form-field">
+          <span class="form-label">City</span>
+          <input class="form-input" type="text" formControlName="city" />
+          @if (controlError('city'); as message) {
+            <span class="form-error">{{ message }}</span>
+          }
+        </label>
+
+        <label class="form-field">
+          <span class="form-label">State</span>
+          <input class="form-input" type="text" formControlName="state" />
+          @if (controlError('state'); as message) {
+            <span class="form-error">{{ message }}</span>
+          }
+        </label>
+
+        <label class="form-field">
+          <span class="form-label">Country</span>
+          <input class="form-input" type="text" formControlName="country" />
+          @if (controlError('country'); as message) {
+            <span class="form-error">{{ message }}</span>
+          }
+        </label>
+
+        <label class="form-field">
+          <span class="form-label">Status *</span>
+          <select class="form-input" formControlName="status">
+            @for (status of statusOptions; track status) {
+              <option [value]="status">{{ status }}</option>
+            }
+          </select>
+          @if (controlError('status'); as message) {
+            <span class="form-error">{{ message }}</span>
+          }
+        </label>
+
+        <div class="form-actions form-field--full">
+          <button type="submit" class="btn btn--primary" [disabled]="saving()">
+            {{ saving() ? 'Saving…' : isEdit() ? 'Save changes' : 'Create branch' }}
+          </button>
+          <a class="btn btn--secondary" routerLink="/settings/branches">Cancel</a>
+        </div>
+      </form>
+    </app-ui-card>
+  }
+</section>

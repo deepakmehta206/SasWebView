@@ -1,0 +1,36 @@
+<section class="profile-page">
+  <app-page-header title="My profile" subtitle="Current authenticated user.">
+    <a class="btn btn--secondary" routerLink="/change-password">Change password</a>
+  </app-page-header>
+
+  @if (loading()) {
+    <app-loading-indicator label="Loading profile…" />
+  } @else if (errorMessage()) {
+    <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+  } @else if (profile()) {
+    <app-ui-card title="Account">
+      <dl class="profile-grid">
+        <div><dt>Username</dt><dd>{{ profile()!.username }}</dd></div>
+        <div><dt>Name</dt><dd>{{ profile()!.firstName }} {{ profile()!.lastName || '' }}</dd></div>
+        <div><dt>Email</dt><dd>{{ profile()!.email || '—' }}</dd></div>
+        <div><dt>Tenant ID</dt><dd>{{ profile()!.tenantId }}</dd></div>
+        <div><dt>Branch ID</dt><dd>{{ profile()!.branchId ?? '—' }}</dd></div>
+        <div><dt>Platform admin</dt><dd>{{ profile()!.isPlatformAdmin ? 'Yes' : 'No' }}</dd></div>
+        <div class="profile-grid__full">
+          <dt>Roles</dt>
+          <dd>{{ profile()!.roles.length ? profile()!.roles.join(', ') : '—' }}</dd>
+        </div>
+        <div class="profile-grid__full">
+          <dt>Permissions</dt>
+          <dd class="profile-perms">
+            @for (code of profile()!.permissions; track code) {
+              <span class="perm-chip">{{ code }}</span>
+            } @empty {
+              —
+            }
+          </dd>
+        </div>
+      </dl>
+    </app-ui-card>
+  }
+</section>

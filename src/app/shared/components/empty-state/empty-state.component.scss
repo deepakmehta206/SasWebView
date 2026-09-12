@@ -1,0 +1,24 @@
+.empty-state {
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+}
+
+.empty-state__title {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--color-text);
+}
+
+.empty-state__message {
+  margin: 0.5rem 0 0;
+  color: var(--color-text-muted);
+  max-width: 28rem;
+  margin-inline: auto;
+}
+
+.empty-state__actions {
+  margin-top: 1rem;
+}

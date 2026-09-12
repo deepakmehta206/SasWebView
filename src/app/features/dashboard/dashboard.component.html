@@ -1,0 +1,23 @@
+<section class="dashboard">
+  <app-page-header
+    title="Dashboard"
+    subtitle="Foundation workspace for the multi-tenant SaaS platform."
+  />
+
+  <div class="dashboard__grid">
+    @for (card of cards; track card.title) {
+      <app-ui-card [title]="card.title">
+        <div class="dashboard__metric">{{ card.value }}</div>
+        <p class="dashboard__hint">{{ card.hint }}</p>
+      </app-ui-card>
+    }
+  </div>
+
+  <app-ui-card title="Getting started" subtitle="Phase 1">
+    <p class="dashboard__intro">
+      This shell establishes layout, routing, shared UI, and API foundations.
+      Authentication, RBAC, tenancy, and business modules will be added in later phases.
+      Backend remains the source of truth for permissions and entitlements.
+    </p>
+  </app-ui-card>
+</section>

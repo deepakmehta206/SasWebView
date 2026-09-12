@@ -1,0 +1,32 @@
+.settings-hub {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.settings-hub__grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.settings-hub__link {
+  text-decoration: none;
+  color: inherit;
+  border-radius: var(--radius-md);
+}
+
+.settings-hub__link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.settings-hub__link p {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+@media (min-width: 800px) {
+  .settings-hub__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

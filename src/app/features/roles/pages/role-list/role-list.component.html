@@ -1,0 +1,48 @@
+<section class="role-list">
+  <app-page-header title="Roles" subtitle="Manage roles and permissions.">
+    <ng-container *appHasPermission="permissionCodes.RoleAdd">
+      <a class="btn btn--primary" routerLink="/roles/new">Add role</a>
+    </ng-container>
+  </app-page-header>
+
+  <app-ui-card title="Role list">
+    <label class="form-field" style="max-width: 20rem; margin-bottom: 1rem">
+      <span class="form-label">Search</span>
+      <input class="form-input" type="search" [formControl]="searchControl" placeholder="Code or name…" />
+    </label>
+    @if (errorMessage()) { <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div> }
+    @if (successMessage()) { <div class="alert alert--success" role="status">{{ successMessage() }}</div> }
+    @if (loading()) {
+      <app-loading-indicator label="Loading roles…" />
+    } @else if (filteredRoles().length === 0) {
+      <app-empty-state title="No roles found" message="Try adjusting search or add a role." />
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Code</th><th>Name</th><th>Status</th><th>System</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            @for (role of filteredRoles(); track role.roleId) {
+              <tr>
+                <td>{{ role.roleCode }}</td>
+                <td>{{ role.roleName }}</td>
+                <td>{{ role.isActive ? 'Active' : 'Inactive' }}</td>
+                <td>{{ role.isSystemRole ? 'Yes' : 'No' }}</td>
+                <td class="data-table__actions">
+                  <ng-container *appHasPermission="permissionCodes.RoleEdit">
+                    <a class="btn btn--secondary btn--compact" [routerLink]="['/roles', role.roleId, 'edit']">Edit</a>
+                    <a class="btn btn--secondary btn--compact" [routerLink]="['/roles', role.roleId, 'permissions']">Permissions</a>
+                  </ng-container>
+                  <ng-container *appHasPermission="permissionCodes.RoleDelete">
+                    <button type="button" class="btn btn--secondary btn--compact" [disabled]="role.isSystemRole || deletingId() === role.roleId" (click)="deleteRole(role)">Delete</button>
+                  </ng-container>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+</section>

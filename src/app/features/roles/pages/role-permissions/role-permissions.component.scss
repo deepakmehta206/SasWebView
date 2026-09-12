@@ -1,0 +1,9 @@
+.role-permissions { display: flex; flex-direction: column; gap: 1.25rem; }
+.muted { color: var(--color-text-muted); margin-top: 0; }
+.module-block { margin: 1.25rem 0; }
+.module-block h3 { margin: 0 0 0.75rem; font-size: 1rem; }
+.perm-grid { display: grid; gap: 0.5rem; }
+.perm-item { display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.55rem 0.7rem; border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+.perm-item strong { display: block; }
+.perm-item small { color: var(--color-text-muted); }
+@media (min-width: 800px) { .perm-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
