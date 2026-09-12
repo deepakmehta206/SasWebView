@@ -198,6 +198,12 @@ textarea.form-input {
   color: var(--color-success);
 }
 
+.alert--info {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
 .alert--list {
   margin: 0 0 1rem;
   padding-left: 1.35rem;

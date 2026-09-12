@@ -1,0 +1,10 @@
+.subscription-usage {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.subscription-usage__summary {
+  margin: 0 0 1rem;
+  color: var(--color-text-muted);
+}

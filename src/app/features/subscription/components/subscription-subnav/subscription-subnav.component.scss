@@ -1,0 +1,35 @@
+.subscription-subnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.subscription-subnav__link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  font-size: 0.9rem;
+}
+
+.subscription-subnav__link:hover {
+  color: var(--color-text);
+  background: var(--color-surface-muted, rgba(0, 0, 0, 0.04));
+}
+
+.subscription-subnav__link.is-active {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  font-weight: 600;
+}
+
+.subscription-subnav__link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

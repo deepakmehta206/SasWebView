@@ -52,3 +52,8 @@ export function extractApiErrorMessage(error: unknown, fallback: string): string
 
   return fallback;
 }
+
+export function extractApiErrorCode(error: unknown): string | null {
+  const errors = extractApiErrors(error);
+  return errors[0]?.code ?? null;
+}

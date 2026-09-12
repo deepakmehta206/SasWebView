@@ -102,6 +102,26 @@ export class ShellComponent {
       return 'Features';
     }
 
+    if (url.startsWith('/subscription/plans')) {
+      return 'Plans';
+    }
+
+    if (url.startsWith('/subscription/usage')) {
+      return 'Usage & limits';
+    }
+
+    if (url.includes('/subscription/invoices/') && !url.endsWith('/invoices')) {
+      return 'Invoice detail';
+    }
+
+    if (url.startsWith('/subscription/invoices')) {
+      return 'Invoices';
+    }
+
+    if (url.startsWith('/subscription')) {
+      return 'Subscription';
+    }
+
     if (url.startsWith('/profile')) {
       return 'My profile';
     }

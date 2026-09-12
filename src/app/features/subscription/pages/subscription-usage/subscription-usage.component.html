@@ -1,0 +1,65 @@
+<section class="subscription-usage">
+  <app-page-header
+    title="Usage & limits"
+    subtitle="Frontend checks are informational only. The API enforces limits."
+  />
+
+  <app-subscription-subnav />
+
+  @if (errorMessage()) {
+    <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+  }
+
+  @if (loading()) {
+    <app-loading-indicator label="Loading usage…" />
+  } @else if (rows().length === 0) {
+    <app-empty-state title="No usage data" message="Usage and limits could not be loaded.">
+      <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+    </app-empty-state>
+  } @else {
+    <app-ui-card title="Current usage">
+      @if (limits(); as lim) {
+        <p class="subscription-usage__summary">
+          Plan {{ lim.planCode || '—' }} · Status {{ lim.subscriptionStatus || '—' }}
+        </p>
+      }
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Resource</th>
+              <th>Used</th>
+              <th>Limit</th>
+              <th>Utilization</th>
+              <th>Can create</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.label) {
+              <tr>
+                <td>{{ row.label }}</td>
+                <td>{{ row.used }}</td>
+                <td>
+                  @if (row.label === 'Storage (MB)') {
+                    {{ formatStorageMb(row.max) }}
+                  } @else {
+                    {{ formatLimit(row.max) }}
+                  }
+                </td>
+                <td>{{ percent(row.used, row.max) }}</td>
+                <td>
+                  @if (row.allowed == null) {
+                    —
+                  } @else {
+                    {{ row.allowed ? 'Yes' : 'No' }}
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-ui-card>
+  }
+</section>

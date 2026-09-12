@@ -68,6 +68,11 @@ export const routes: Routes = [
           import('./features/features/features.routes').then((m) => m.FEATURES_ROUTES)
       },
       {
+        path: 'subscription',
+        loadChildren: () =>
+          import('./features/subscription/subscription.routes').then((m) => m.SUBSCRIPTION_ROUTES)
+      },
+      {
         path: 'profile',
         loadComponent: () =>
           import('./features/auth/pages/profile/profile.component').then((m) => m.ProfileComponent)

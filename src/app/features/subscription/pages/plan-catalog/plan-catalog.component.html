@@ -1,0 +1,89 @@
+<section class="plan-catalog">
+  <app-page-header
+    title="Plans"
+    subtitle="Active plans available to this tenant. Create/edit is not available in this release."
+  />
+
+  <app-subscription-subnav />
+
+  @if (errorMessage()) {
+    <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+  }
+  @if (successMessage()) {
+    <div class="alert alert--success" role="status">{{ successMessage() }}</div>
+  }
+  @if (infoMessage()) {
+    <div class="alert alert--info" role="status">{{ infoMessage() }}</div>
+  }
+
+  <app-ui-card title="Change options">
+    <form class="plan-catalog__options" [formGroup]="changeForm">
+      <label class="form-field">
+        <span class="form-label">Billing cycle</span>
+        <select class="form-input" formControlName="billingCycle">
+          <option value="MONTHLY">MONTHLY</option>
+          <option value="YEARLY">YEARLY</option>
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Reason (optional)</span>
+        <input class="form-input" type="text" formControlName="reason" />
+      </label>
+    </form>
+  </app-ui-card>
+
+  @if (loading()) {
+    <app-loading-indicator label="Loading plans…" />
+  } @else if (plans().length === 0) {
+    <app-empty-state title="No plans" message="No active plans were returned by the API.">
+      <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+    </app-empty-state>
+  } @else {
+    <div class="plan-catalog__grid">
+      @for (plan of plans(); track plan.planId) {
+        @let action = resolveAction(plan);
+        <app-ui-card [title]="plan.planName">
+          <p class="plan-catalog__code">{{ plan.planCode }}</p>
+          @if (plan.description) {
+            <p class="plan-catalog__desc">{{ plan.description }}</p>
+          }
+          <ul class="plan-catalog__meta">
+            <li>
+              Monthly: {{ formatMoney(plan.monthlyPrice, plan.currencyCode) }}
+            </li>
+            <li>
+              Yearly: {{ formatMoney(plan.yearlyPrice, plan.currencyCode) }}
+            </li>
+            <li>Users: {{ formatLimit(plan.maxUsers) }}</li>
+            <li>Branches: {{ formatLimit(plan.maxBranches) }}</li>
+            <li>Storage: {{ formatStorageMb(plan.maxStorageMB) }}</li>
+            <li>Features: {{ plan.features.length || 0 }}</li>
+          </ul>
+
+          @if (action === 'current') {
+            <span class="status-pill status-pill--active">Current plan</span>
+          } @else {
+            <ng-container *appHasPermission="permissionCodes.SubscriptionManage">
+              <button
+                type="button"
+                class="btn"
+                [class.btn--primary]="action === 'upgrade'"
+                [class.btn--secondary]="action === 'downgrade'"
+                [disabled]="actionBusyPlanId() != null"
+                (click)="changePlan(plan)"
+              >
+                @if (actionBusyPlanId() === plan.planId) {
+                  Working…
+                } @else if (action === 'upgrade') {
+                  Upgrade
+                } @else {
+                  Downgrade
+                }
+              </button>
+            </ng-container>
+          }
+        </app-ui-card>
+      }
+    </div>
+  }
+</section>

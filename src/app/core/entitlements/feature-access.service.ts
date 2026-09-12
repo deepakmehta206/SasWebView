@@ -3,15 +3,23 @@ import { Observable, catchError, map, of, tap } from 'rxjs';
 import { ApiService } from '../services/api.service';
 import { ApiResponse } from '../models/api-response.model';
 import { EffectiveAccessDto, EffectiveModuleDto } from './feature-access.models';
+import { EntitlementService } from './entitlement.service';
+import {
+  EffectiveEntitlementModuleDto,
+  EffectiveEntitlementsDto
+} from './entitlement.models';
 
 /**
- * Holds tenant module/feature availability from GET /me/features.
- * Phase 4 only — does not use subscription entitlements (Phase 5).
+ * Holds tenant module/feature availability for nav/UX gating.
+ * Primary source: GET /me/entitlements (available → enabled).
+ * Fallback: GET /me/features when entitlements fail.
+ * Public API and signal shape are preserved from Phase 4.
  * UX visibility only; backend remains authoritative.
  */
 @Injectable({ providedIn: 'root' })
 export class FeatureAccessService {
   private readonly api = inject(ApiService);
+  private readonly entitlements = inject(EntitlementService);
 
   private readonly modulesSignal = signal<EffectiveModuleDto[]>([]);
   private readonly loadedSignal = signal(false);
@@ -52,21 +60,10 @@ export class FeatureAccessService {
     this.loadingSignal.set(true);
     this.errorSignal.set(null);
 
-    return this.api.get<ApiResponse<EffectiveAccessDto>>('/me/features').pipe(
-      map((response) => response.data ?? { modules: [] }),
-      tap((data) => {
-        this.modulesSignal.set(data.modules ?? []);
-        this.loadedSignal.set(true);
-        this.loadingSignal.set(false);
-      }),
-      catchError((_error: unknown) => {
-        this.modulesSignal.set([]);
-        this.loadedSignal.set(true);
-        this.loadingSignal.set(false);
-        this.errorSignal.set('Unable to load effective features.');
-        // Do not block login — return empty access.
-        return of({ modules: [] } satisfies EffectiveAccessDto);
-      })
+    return this.entitlements.load().pipe(
+      map((data) => mapEntitlementsToAccess(data)),
+      tap((access) => this.applyAccess(access)),
+      catchError(() => this.loadFeaturesFallback())
     );
   }
 
@@ -79,6 +76,7 @@ export class FeatureAccessService {
     this.loadedSignal.set(false);
     this.loadingSignal.set(false);
     this.errorSignal.set(null);
+    this.entitlements.clear();
   }
 
   isModuleEnabled(moduleCode: string): boolean {
@@ -102,4 +100,45 @@ export class FeatureAccessService {
   getEnabledFeatures(): string[] {
     return [...this.enabledFeatureCodes()];
   }
+
+  private loadFeaturesFallback(): Observable<EffectiveAccessDto> {
+    this.entitlements.clearAfterFallback();
+
+    return this.api.get<ApiResponse<EffectiveAccessDto>>('/me/features').pipe(
+      map((response) => response.data ?? { modules: [] }),
+      tap((data) => this.applyAccess(data)),
+      catchError((_error: unknown) => {
+        this.modulesSignal.set([]);
+        this.loadedSignal.set(true);
+        this.loadingSignal.set(false);
+        this.errorSignal.set('Unable to load effective features.');
+        return of({ modules: [] } satisfies EffectiveAccessDto);
+      })
+    );
+  }
+
+  private applyAccess(data: EffectiveAccessDto): void {
+    this.modulesSignal.set(data.modules ?? []);
+    this.loadedSignal.set(true);
+    this.loadingSignal.set(false);
+    this.errorSignal.set(null);
+  }
+}
+
+function mapEntitlementsToAccess(data: EffectiveEntitlementsDto): EffectiveAccessDto {
+  return {
+    modules: (data.modules ?? []).map((module) => mapModule(module))
+  };
+}
+
+function mapModule(module: EffectiveEntitlementModuleDto): EffectiveModuleDto {
+  return {
+    code: module.code,
+    name: module.name,
+    enabled: module.available,
+    features: (module.features ?? []).map((feature) => ({
+      code: feature.code,
+      enabled: feature.available
+    }))
+  };
 }

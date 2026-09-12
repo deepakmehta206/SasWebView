@@ -68,7 +68,8 @@ export const SIDEBAR_NAV_ITEMS: readonly NavItem[] = [
     label: 'Subscription',
     route: '/subscription',
     icon: 'subscription',
-    enabled: false
+    enabled: true,
+    anyPermissions: [PermissionCodes.SubscriptionView]
   },
   {
     label: 'HRMS',

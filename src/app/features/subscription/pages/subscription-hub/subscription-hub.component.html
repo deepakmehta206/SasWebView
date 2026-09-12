@@ -1,0 +1,147 @@
+<section class="subscription-hub">
+  <app-page-header
+    title="Subscription"
+    subtitle="Current plan, lifecycle actions, and billing links for this tenant."
+  />
+
+  <app-subscription-subnav />
+
+  @if (errorMessage()) {
+    <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+  }
+  @if (successMessage()) {
+    <div class="alert alert--success" role="status">{{ successMessage() }}</div>
+  }
+  @if (infoMessage()) {
+    <div class="alert alert--info" role="status">{{ infoMessage() }}</div>
+  }
+
+  @if (loading()) {
+    <app-loading-indicator label="Loading subscription…" />
+  } @else if (!subscription()) {
+    <app-empty-state
+      title="No subscription"
+      message="This tenant does not have an active subscription record."
+    >
+      <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+    </app-empty-state>
+  } @else {
+    @let sub = subscription()!;
+
+    <div class="subscription-hub__grid">
+      <app-ui-card title="Current plan">
+        <dl class="detail-list">
+          <div>
+            <dt>Plan</dt>
+            <dd>{{ sub.planName }} ({{ sub.planCode }})</dd>
+          </div>
+          <div>
+            <dt>Status</dt>
+            <dd>
+              <span class="status-pill">{{ sub.status }}</span>
+            </dd>
+          </div>
+          <div>
+            <dt>Billing cycle</dt>
+            <dd>{{ sub.billingCycle }}</dd>
+          </div>
+          <div>
+            <dt>Start</dt>
+            <dd>{{ formatDate(sub.startDate) }}</dd>
+          </div>
+          <div>
+            <dt>End</dt>
+            <dd>{{ formatDate(sub.endDate) }}</dd>
+          </div>
+          <div>
+            <dt>Auto-renew</dt>
+            <dd>{{ sub.autoRenew ? 'Yes' : 'No' }}</dd>
+          </div>
+          <div>
+            <dt>Limits</dt>
+            <dd>
+              Users {{ formatLimit(sub.maxUsers) }} · Branches {{ formatLimit(sub.maxBranches) }} ·
+              Storage {{ formatStorageMb(sub.maxStorageMB) }}
+            </dd>
+          </div>
+          <div>
+            <dt>Entitlements</dt>
+            <dd>{{ entitlementsSummary() }}</dd>
+          </div>
+        </dl>
+      </app-ui-card>
+
+      @if (hasPendingDowngrade(sub)) {
+        <app-ui-card title="Pending downgrade">
+          <div class="alert alert--info" role="status">
+            A plan change is scheduled. Access and data are unchanged until the effective date.
+          </div>
+          <dl class="detail-list">
+            <div>
+              <dt>Pending plan ID</dt>
+              <dd>{{ sub.pendingPlanId }}</dd>
+            </div>
+            <div>
+              <dt>Pending billing cycle</dt>
+              <dd>{{ sub.pendingBillingCycle || '—' }}</dd>
+            </div>
+            <div>
+              <dt>Effective date</dt>
+              <dd>{{ formatDate(sub.pendingEffectiveDate) }}</dd>
+            </div>
+          </dl>
+        </app-ui-card>
+      }
+    </div>
+
+    <div class="subscription-hub__links">
+      @for (link of links; track link.route) {
+        <a
+          *appHasPermission="link.permission"
+          class="subscription-hub__link"
+          [routerLink]="link.route"
+        >
+          <app-ui-card [title]="link.title">
+            <p>{{ link.description }}</p>
+          </app-ui-card>
+        </a>
+      }
+    </div>
+
+    <ng-container *appHasPermission="permissionCodes.SubscriptionManage">
+      <div class="subscription-hub__actions">
+        <app-ui-card title="Cancel subscription">
+          <form class="form-stack" [formGroup]="cancelForm" (ngSubmit)="cancel()">
+            <label class="form-field">
+              <span class="form-label">Reason (optional)</span>
+              <input class="form-input" type="text" formControlName="reason" />
+            </label>
+            <label class="form-check">
+              <input type="checkbox" formControlName="preserveAccessUntilPeriodEnd" />
+              <span>Keep access until the current period ends</span>
+            </label>
+            <button class="btn btn--secondary" type="submit" [disabled]="actionBusy()">
+              Cancel subscription
+            </button>
+          </form>
+        </app-ui-card>
+
+        <app-ui-card title="Renew subscription">
+          <form class="form-stack" [formGroup]="renewForm" (ngSubmit)="renew()">
+            <label class="form-field">
+              <span class="form-label">Billing cycle (optional)</span>
+              <select class="form-input" formControlName="billingCycle">
+                <option value="">Keep current ({{ sub.billingCycle }})</option>
+                <option value="MONTHLY">MONTHLY</option>
+                <option value="YEARLY">YEARLY</option>
+              </select>
+            </label>
+            <button class="btn btn--primary" type="submit" [disabled]="actionBusy()">
+              Renew
+            </button>
+          </form>
+        </app-ui-card>
+      </div>
+    </ng-container>
+  }
+</section>

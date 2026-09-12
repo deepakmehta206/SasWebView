@@ -1,0 +1,59 @@
+<section class="invoice-detail">
+  <app-page-header title="Invoice detail" subtitle="Read-only invoice for the current tenant.">
+    <a class="btn btn--secondary" routerLink="/subscription/invoices">Back to invoices</a>
+  </app-page-header>
+
+  <app-subscription-subnav />
+
+  @if (errorMessage()) {
+    <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+  }
+
+  @if (loading()) {
+    <app-loading-indicator label="Loading invoice…" />
+  } @else if (!invoice()) {
+    <app-empty-state title="Invoice not found" message="The requested invoice could not be loaded.">
+      <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+    </app-empty-state>
+  } @else {
+    @let inv = invoice()!;
+    <app-ui-card [title]="inv.invoiceNumber">
+      <dl class="detail-list">
+        <div>
+          <dt>Status</dt>
+          <dd><span class="status-pill">{{ inv.status }}</span></dd>
+        </div>
+        <div>
+          <dt>Billing period</dt>
+          <dd>
+            {{ formatDate(inv.billingPeriodStart) }} – {{ formatDate(inv.billingPeriodEnd) }}
+          </dd>
+        </div>
+        <div>
+          <dt>Subtotal</dt>
+          <dd>{{ formatMoney(inv.subtotal, inv.currencyCode) }}</dd>
+        </div>
+        <div>
+          <dt>Tax</dt>
+          <dd>{{ formatMoney(inv.tax, inv.currencyCode) }}</dd>
+        </div>
+        <div>
+          <dt>Discount</dt>
+          <dd>{{ formatMoney(inv.discount, inv.currencyCode) }}</dd>
+        </div>
+        <div>
+          <dt>Total</dt>
+          <dd>{{ formatMoney(inv.total, inv.currencyCode) }}</dd>
+        </div>
+        <div>
+          <dt>Due date</dt>
+          <dd>{{ formatDate(inv.dueDate) }}</dd>
+        </div>
+        <div>
+          <dt>Paid date</dt>
+          <dd>{{ formatDate(inv.paidDate) }}</dd>
+        </div>
+      </dl>
+    </app-ui-card>
+  }
+</section>

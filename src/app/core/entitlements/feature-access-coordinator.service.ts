@@ -4,8 +4,9 @@ import { NavigationService } from '../constants/nav.config';
 import { FeatureAccessService } from './feature-access.service';
 
 /**
- * Reloads /me/features and redirects away from routes belonging to
- * disabled modules/features. Does not logout.
+ * Reloads effective feature access (entitlements primary, /me/features fallback)
+ * and redirects away from routes belonging to disabled modules/features.
+ * Does not logout.
  */
 @Injectable({ providedIn: 'root' })
 export class FeatureAccessCoordinator {

@@ -1,0 +1,32 @@
+<nav class="subscription-subnav" aria-label="Subscription sections">
+  <a
+    class="subscription-subnav__link"
+    routerLink="/subscription"
+    routerLinkActive="is-active"
+    [routerLinkActiveOptions]="{ exact: true }"
+  >
+    Overview
+  </a>
+  <a
+    *appHasPermission="permissionCodes.PlanView"
+    class="subscription-subnav__link"
+    routerLink="/subscription/plans"
+    routerLinkActive="is-active"
+  >
+    Plans
+  </a>
+  <a
+    class="subscription-subnav__link"
+    routerLink="/subscription/usage"
+    routerLinkActive="is-active"
+  >
+    Usage
+  </a>
+  <a
+    class="subscription-subnav__link"
+    routerLink="/subscription/invoices"
+    routerLinkActive="is-active"
+  >
+    Invoices
+  </a>
+</nav>

@@ -19,6 +19,7 @@ import { PermissionService } from '../permissions/permission.service';
 import { BranchContextService } from '../../features/branch/services/branch-context.service';
 import { TenantContextService } from '../../features/tenant/services/tenant-context.service';
 import { FeatureAccessService } from '../entitlements/feature-access.service';
+import { SubscriptionService } from '../../features/subscription/services/subscription.service';
 import { AuthStateService, AuthUser } from './auth-state.service';
 import {
   ChangePasswordRequest,
@@ -41,6 +42,7 @@ export class AuthService {
   private readonly tokenStorage = inject(TokenStorageService);
   private readonly permissions = inject(PermissionService);
   private readonly featureAccess = inject(FeatureAccessService);
+  private readonly subscription = inject(SubscriptionService);
   private readonly tenantContext = inject(TenantContextService);
   private readonly branchContext = inject(BranchContextService);
   private readonly router = inject(Router);
@@ -212,6 +214,7 @@ export class AuthService {
     this.authState.clearSession();
     this.permissions.clear();
     this.featureAccess.clear();
+    this.subscription.clear();
     this.tenantContext.clearAuthenticatedTenant();
     this.branchContext.clearSession();
   }
