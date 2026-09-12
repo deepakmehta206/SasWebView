@@ -1,0 +1,62 @@
+<section class="module-list">
+  <app-page-header title="Modules" subtitle="Platform module catalog.">
+    <ng-container *appHasPermission="permissionCodes.ModuleAdd">
+      <a class="btn btn--primary" routerLink="/modules/new">Add module</a>
+    </ng-container>
+  </app-page-header>
+
+  <app-ui-card title="Module list">
+    <div class="filters">
+      <label class="form-field">
+        <span class="form-label">Search</span>
+        <input class="form-input" type="search" [formControl]="searchControl" placeholder="Code or name…" />
+      </label>
+      <label class="check-field">
+        <input type="checkbox" [formControl]="includeInactive" />
+        <span>Include inactive</span>
+      </label>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+    }
+
+    @if (loading()) {
+      <app-loading-indicator label="Loading modules…" />
+    } @else if (filtered().length === 0) {
+      <app-empty-state title="No modules found" message="Try adjusting filters." />
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Order</th>
+              <th>System</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (module of filtered(); track module.moduleId) {
+              <tr>
+                <td>{{ module.moduleCode }}</td>
+                <td>{{ module.moduleName }}</td>
+                <td>{{ module.displayOrder }}</td>
+                <td>{{ module.isSystemModule ? 'Yes' : 'No' }}</td>
+                <td>{{ module.isActive ? 'Active' : 'Inactive' }}</td>
+                <td class="data-table__actions">
+                  <a class="btn btn--secondary btn--compact" [routerLink]="['/modules', module.moduleId]">View</a>
+                  <ng-container *appHasPermission="permissionCodes.ModuleEdit">
+                    <a class="btn btn--secondary btn--compact" [routerLink]="['/modules', module.moduleId, 'edit']">Edit</a>
+                  </ng-container>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+</section>

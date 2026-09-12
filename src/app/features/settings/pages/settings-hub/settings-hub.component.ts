@@ -32,6 +32,16 @@ export class SettingsHubComponent {
       title: 'Tenant settings',
       description: 'Simple key/value settings for the tenant.',
       route: '/settings/tenant-settings'
+    },
+    {
+      title: 'Tenant modules',
+      description: 'Enable or disable product modules for this tenant.',
+      route: '/settings/modules'
+    },
+    {
+      title: 'Tenant features',
+      description: 'Enable or disable features within modules.',
+      route: '/settings/features'
     }
   ];
 }

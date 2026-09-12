@@ -74,6 +74,34 @@ export class ShellComponent {
       return 'Roles';
     }
 
+    if (url.startsWith('/modules/new')) {
+      return 'Add module';
+    }
+
+    if (url.includes('/modules/') && url.endsWith('/edit')) {
+      return 'Edit module';
+    }
+
+    if (url.startsWith('/modules/')) {
+      return 'Module details';
+    }
+
+    if (url.startsWith('/modules')) {
+      return 'Modules';
+    }
+
+    if (url.startsWith('/features/new')) {
+      return 'Add feature';
+    }
+
+    if (url.includes('/features/') && url.endsWith('/edit')) {
+      return 'Edit feature';
+    }
+
+    if (url.startsWith('/features')) {
+      return 'Features';
+    }
+
     if (url.startsWith('/profile')) {
       return 'My profile';
     }
@@ -104,6 +132,14 @@ export class ShellComponent {
 
     if (url.startsWith('/settings/branches')) {
       return 'Branches';
+    }
+
+    if (url.startsWith('/settings/modules')) {
+      return 'Tenant modules';
+    }
+
+    if (url.startsWith('/settings/features')) {
+      return 'Tenant features';
     }
 
     if (url.startsWith('/settings')) {

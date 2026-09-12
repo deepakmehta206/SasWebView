@@ -1,0 +1,56 @@
+<section class="tenant-features">
+  <app-page-header title="Tenant features" subtitle="Enable or disable features for the current tenant." />
+
+  <app-ui-card title="Features by module">
+    @if (errorMessage()) { <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div> }
+    @if (successMessage()) { <div class="alert alert--success" role="status">{{ successMessage() }}</div> }
+
+    @if (loading()) {
+      <app-loading-indicator label="Loading tenant features…" />
+    } @else if (grouped().length === 0) {
+      <app-empty-state title="No features" message="No tenant feature configuration returned.">
+        <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+      </app-empty-state>
+    } @else {
+      @for (group of grouped(); track group.moduleCode) {
+        <div class="module-group">
+          <h3>{{ group.moduleCode }} <span class="muted">{{ group.moduleName }}</span></h3>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr><th>Feature</th><th>Enabled</th><th>Actions</th></tr>
+              </thead>
+              <tbody>
+                @for (item of group.features; track item.featureId) {
+                  <tr>
+                    <td>
+                      <strong>{{ item.featureCode }}</strong>
+                      <div class="muted">{{ item.featureName }}</div>
+                    </td>
+                    <td>
+                      <span class="status-pill" [class.on]="item.isEnabled" [class.off]="!item.isEnabled">
+                        {{ item.isEnabled ? 'ON' : 'OFF' }}
+                      </span>
+                    </td>
+                    <td>
+                      <ng-container *appHasPermission="permissionCodes.TenantFeatureEdit">
+                        <button
+                          type="button"
+                          class="btn btn--secondary btn--compact"
+                          [disabled]="savingId() === item.featureId"
+                          (click)="toggle(item)"
+                        >
+                          {{ item.isEnabled ? 'Disable' : 'Enable' }}
+                        </button>
+                      </ng-container>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    }
+  </app-ui-card>
+</section>

@@ -1,0 +1,43 @@
+<section class="module-details">
+  <app-page-header title="Module details" subtitle="Catalog module and its features.">
+    <a class="btn btn--secondary" routerLink="/modules">Back</a>
+    @if (module(); as current) {
+      <ng-container *appHasPermission="permissionCodes.ModuleEdit">
+        <a class="btn btn--primary" [routerLink]="['/modules', current.moduleId, 'edit']">Edit</a>
+      </ng-container>
+    }
+  </app-page-header>
+
+  @if (loading()) {
+    <app-loading-indicator label="Loading module…" />
+  } @else if (!module()) {
+    <app-empty-state title="Module unavailable" [message]="errorMessage() || 'Not found.'" />
+  } @else {
+    @if (errorMessage()) { <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div> }
+    <app-ui-card title="Module">
+      <dl class="detail-grid">
+        <div><dt>Code</dt><dd>{{ module()!.moduleCode }}</dd></div>
+        <div><dt>Name</dt><dd>{{ module()!.moduleName }}</dd></div>
+        <div><dt>Order</dt><dd>{{ module()!.displayOrder }}</dd></div>
+        <div><dt>System</dt><dd>{{ module()!.isSystemModule ? 'Yes' : 'No' }}</dd></div>
+        <div><dt>Status</dt><dd>{{ module()!.isActive ? 'Active' : 'Inactive' }}</dd></div>
+        <div><dt>Route</dt><dd>{{ module()!.route || '—' }}</dd></div>
+        <div class="full"><dt>Description</dt><dd>{{ module()!.description || '—' }}</dd></div>
+      </dl>
+    </app-ui-card>
+    <app-ui-card title="Features" [subtitle]="features().length + ' feature(s)'">
+      @if (features().length === 0) {
+        <p>No features for this module.</p>
+      } @else {
+        <ul class="feature-list">
+          @for (feature of features(); track feature.featureId) {
+            <li>
+              <strong>{{ feature.featureCode }}</strong> — {{ feature.featureName }}
+              ({{ feature.isActive ? 'Active' : 'Inactive' }})
+            </li>
+          }
+        </ul>
+      }
+    </app-ui-card>
+  }
+</section>

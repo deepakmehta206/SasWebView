@@ -58,6 +58,16 @@ export const routes: Routes = [
           import('./features/roles/roles.routes').then((m) => m.ROLES_ROUTES)
       },
       {
+        path: 'modules',
+        loadChildren: () =>
+          import('./features/modules/modules.routes').then((m) => m.MODULES_ROUTES)
+      },
+      {
+        path: 'features',
+        loadChildren: () =>
+          import('./features/features/features.routes').then((m) => m.FEATURES_ROUTES)
+      },
+      {
         path: 'profile',
         loadComponent: () =>
           import('./features/auth/pages/profile/profile.component').then((m) => m.ProfileComponent)

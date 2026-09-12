@@ -18,7 +18,18 @@ export const PermissionCodes = {
 
   TenantView: 'TENANT_VIEW',
   TenantAdd: 'TENANT_ADD',
-  TenantEdit: 'TENANT_EDIT'
+  TenantEdit: 'TENANT_EDIT',
+
+  ModuleView: 'MODULE_VIEW',
+  ModuleAdd: 'MODULE_ADD',
+  ModuleEdit: 'MODULE_EDIT',
+
+  FeatureView: 'FEATURE_VIEW',
+  FeatureAdd: 'FEATURE_ADD',
+  FeatureEdit: 'FEATURE_EDIT',
+
+  TenantModuleEdit: 'TENANT_MODULE_EDIT',
+  TenantFeatureEdit: 'TENANT_FEATURE_EDIT'
 } as const;
 
 export type PermissionCode = (typeof PermissionCodes)[keyof typeof PermissionCodes];

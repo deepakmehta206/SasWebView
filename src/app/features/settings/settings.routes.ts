@@ -38,5 +38,19 @@ export const SETTINGS_ROUTES: Routes = [
     path: 'branches/:branchId/edit',
     loadComponent: () =>
       import('../branch/pages/branch-form/branch-form.component').then((m) => m.BranchFormComponent)
+  },
+  {
+    path: 'modules',
+    loadComponent: () =>
+      import('../modules/pages/tenant-modules/tenant-modules.component').then(
+        (m) => m.TenantModulesComponent
+      )
+  },
+  {
+    path: 'features',
+    loadComponent: () =>
+      import('../features/pages/tenant-features/tenant-features.component').then(
+        (m) => m.TenantFeaturesComponent
+      )
   }
 ];

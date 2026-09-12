@@ -1,0 +1,43 @@
+<section class="feature-form">
+  <app-page-header [title]="isEdit() ? 'Edit feature' : 'Add feature'" subtitle="Catalog feature definition. Platform admin required by backend.">
+    <a class="btn btn--secondary" routerLink="/features">Back</a>
+  </app-page-header>
+  @if (loading()) {
+    <app-loading-indicator label="Loading feature…" />
+  } @else if (loadFailed()) {
+    <app-empty-state title="Feature unavailable" [message]="errorMessage() || 'Unable to load.'" />
+  } @else {
+    <app-ui-card title="Feature details">
+      @if (errorMessage()) { <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div> }
+      @if (fieldErrors().length) {
+        <ul class="alert alert--danger alert--list" role="alert">
+          @for (item of fieldErrors(); track item.code + item.message) {
+            <li>{{ item.code }}: {{ item.message }}</li>
+          }
+        </ul>
+      }
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="save()" novalidate>
+        <label class="form-field">
+          <span class="form-label">Module *</span>
+          <select class="form-input" formControlName="moduleId">
+            <option value="">Select module</option>
+            @for (module of modules(); track module.moduleId) {
+              <option [value]="module.moduleId">{{ module.moduleCode }} — {{ module.moduleName }}</option>
+            }
+          </select>
+        </label>
+        <label class="form-field"><span class="form-label">Feature code *</span><input class="form-input" type="text" formControlName="featureCode" /></label>
+        <label class="form-field"><span class="form-label">Feature name *</span><input class="form-input" type="text" formControlName="featureName" /></label>
+        <label class="form-field"><span class="form-label">Display order</span><input class="form-input" type="number" formControlName="displayOrder" /></label>
+        <label class="form-field form-field--full"><span class="form-label">Description</span><textarea class="form-input" rows="3" formControlName="description"></textarea></label>
+        @if (isEdit()) {
+          <label class="form-field check-field"><input type="checkbox" formControlName="isActive" /><span>Active</span></label>
+        }
+        <div class="form-actions form-field--full">
+          <button type="submit" class="btn btn--primary" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Save' }}</button>
+          <a class="btn btn--secondary" routerLink="/features">Cancel</a>
+        </div>
+      </form>
+    </app-ui-card>
+  }
+</section>

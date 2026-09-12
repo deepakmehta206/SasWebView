@@ -1,0 +1,52 @@
+<section class="tenant-modules">
+  <app-page-header title="Tenant modules" subtitle="Enable or disable product modules for the current tenant." />
+
+  <app-ui-card title="Modules">
+    @if (errorMessage()) { <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div> }
+    @if (successMessage()) { <div class="alert alert--success" role="status">{{ successMessage() }}</div> }
+
+    @if (loading()) {
+      <app-loading-indicator label="Loading tenant modules…" />
+    } @else if (items().length === 0) {
+      <app-empty-state title="No modules" message="No tenant module configuration returned.">
+        <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+      </app-empty-state>
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Module</th><th>System</th><th>Enabled</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            @for (item of items(); track item.moduleId) {
+              <tr>
+                <td>
+                  <strong>{{ item.moduleCode }}</strong>
+                  <div class="muted">{{ item.moduleName }}</div>
+                </td>
+                <td>{{ item.isSystemModule ? 'Yes' : 'No' }}</td>
+                <td>
+                  <span class="status-pill" [class.on]="item.isEnabled" [class.off]="!item.isEnabled">
+                    {{ item.isEnabled ? 'ON' : 'OFF' }}
+                  </span>
+                </td>
+                <td>
+                  <ng-container *appHasPermission="permissionCodes.TenantModuleEdit">
+                    <button
+                      type="button"
+                      class="btn btn--secondary btn--compact"
+                      [disabled]="item.isSystemModule || savingId() === item.moduleId"
+                      (click)="toggle(item)"
+                    >
+                      {{ item.isEnabled ? 'Disable' : 'Enable' }}
+                    </button>
+                  </ng-container>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+</section>

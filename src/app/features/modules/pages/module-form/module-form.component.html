@@ -1,0 +1,37 @@
+<section class="module-form">
+  <app-page-header [title]="isEdit() ? 'Edit module' : 'Add module'" subtitle="Catalog module definition. Platform admin required by backend.">
+    <a class="btn btn--secondary" routerLink="/modules">Back</a>
+  </app-page-header>
+  @if (loading()) {
+    <app-loading-indicator label="Loading module…" />
+  } @else if (loadFailed()) {
+    <app-empty-state title="Module unavailable" [message]="errorMessage() || 'Unable to load module.'" />
+  } @else {
+    <app-ui-card title="Module details">
+      @if (errorMessage()) { <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div> }
+      @if (fieldErrors().length) {
+        <ul class="alert alert--danger alert--list" role="alert">
+          @for (item of fieldErrors(); track item.code + item.message) {
+            <li>{{ item.code }}: {{ item.message }}</li>
+          }
+        </ul>
+      }
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="save()" novalidate>
+        <label class="form-field"><span class="form-label">Module code *</span><input class="form-input" type="text" formControlName="moduleCode" /></label>
+        <label class="form-field"><span class="form-label">Module name *</span><input class="form-input" type="text" formControlName="moduleName" /></label>
+        <label class="form-field form-field--full"><span class="form-label">Description</span><textarea class="form-input" rows="3" formControlName="description"></textarea></label>
+        <label class="form-field"><span class="form-label">Display order</span><input class="form-input" type="number" formControlName="displayOrder" /></label>
+        <label class="form-field"><span class="form-label">Icon</span><input class="form-input" type="text" formControlName="icon" /></label>
+        <label class="form-field"><span class="form-label">Route</span><input class="form-input" type="text" formControlName="route" /></label>
+        <label class="form-field check-field"><input type="checkbox" formControlName="isSystemModule" /><span>System module</span></label>
+        @if (isEdit()) {
+          <label class="form-field check-field"><input type="checkbox" formControlName="isActive" /><span>Active</span></label>
+        }
+        <div class="form-actions form-field--full">
+          <button type="submit" class="btn btn--primary" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Save' }}</button>
+          <a class="btn btn--secondary" routerLink="/modules">Cancel</a>
+        </div>
+      </form>
+    </app-ui-card>
+  }
+</section>

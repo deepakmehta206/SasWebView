@@ -1,24 +1,33 @@
 import { Injectable, inject } from '@angular/core';
 import { PermissionCodes } from './permission-codes';
 import { PermissionService } from '../permissions/permission.service';
+import { FeatureAccessService } from '../entitlements/feature-access.service';
 
 export interface NavItem {
   label: string;
   route?: string;
   icon?: string;
-  /** When false, item is a future placeholder (Soon). */
-  enabled: boolean;
   /**
-   * Optional permission requirements for visibility (UX only).
-   * Omit for always-visible enabled items (e.g. Dashboard).
+   * When false, item is a future placeholder (Soon) — still subject to module/feature gating.
+   * When true, item is navigable if module/feature/permission checks pass.
+   */
+  enabled: boolean;
+  /** Product module code (e.g. HRMS). Disabled module hides the item entirely. */
+  moduleCode?: string;
+  /** Feature code (e.g. HRMS_EMPLOYEE). Disabled feature hides the item. */
+  featureCode?: string;
+  /**
+   * Optional permission requirements (UX only).
+   * Evaluated only after module/feature checks pass.
    */
   anyPermissions?: readonly string[];
   children?: NavItem[];
 }
 
 /**
- * Static nav definition. Visibility filtering uses PermissionService via NavigationService —
- * do not put permission logic in the sidebar component.
+ * Static nav definition.
+ * Visibility = FeatureAccessService + PermissionService via NavigationService.
+ * Do not put module/permission logic in the sidebar component.
  */
 export const SIDEBAR_NAV_ITEMS: readonly NavItem[] = [
   {
@@ -45,7 +54,15 @@ export const SIDEBAR_NAV_ITEMS: readonly NavItem[] = [
     label: 'Modules',
     route: '/modules',
     icon: 'modules',
-    enabled: false
+    enabled: true,
+    anyPermissions: [PermissionCodes.ModuleView]
+  },
+  {
+    label: 'Features',
+    route: '/features',
+    icon: 'features',
+    enabled: true,
+    anyPermissions: [PermissionCodes.FeatureView]
   },
   {
     label: 'Subscription',
@@ -57,19 +74,43 @@ export const SIDEBAR_NAV_ITEMS: readonly NavItem[] = [
     label: 'HRMS',
     route: '/hrms',
     icon: 'hrms',
-    enabled: false
+    enabled: false,
+    moduleCode: 'HRMS'
   },
   {
     label: 'Inventory',
     route: '/inventory',
     icon: 'inventory',
-    enabled: false
+    enabled: false,
+    moduleCode: 'INVENTORY'
   },
   {
     label: 'Billing',
     route: '/billing',
     icon: 'billing',
-    enabled: false
+    enabled: false,
+    moduleCode: 'BILLING'
+  },
+  {
+    label: 'Hospital',
+    route: '/hospital',
+    icon: 'hospital',
+    enabled: false,
+    moduleCode: 'HOSPITAL'
+  },
+  {
+    label: 'School',
+    route: '/school',
+    icon: 'school',
+    enabled: false,
+    moduleCode: 'SCHOOL'
+  },
+  {
+    label: 'Clinic',
+    route: '/clinic',
+    icon: 'clinic',
+    enabled: false,
+    moduleCode: 'CLINIC'
   },
   {
     label: 'Settings',
@@ -78,29 +119,67 @@ export const SIDEBAR_NAV_ITEMS: readonly NavItem[] = [
     enabled: true,
     anyPermissions: [PermissionCodes.TenantView, PermissionCodes.SettingsView]
   }
-] as const;
+];
 
 @Injectable({ providedIn: 'root' })
 export class NavigationService {
   private readonly permissions = inject(PermissionService);
+  private readonly featureAccess = inject(FeatureAccessService);
 
   /**
-   * Returns nav items visible for the current permission set.
-   * Disabled (Soon) items remain visible as placeholders.
+   * Evaluation order (approved):
+   * - moduleCode / featureCode must pass (even for Soon items)
+   * - enabled === false → show as Soon (caller renders badge)
+   * - enabled === true → permission check → visible
    */
   getVisibleNavItems(source: readonly NavItem[] = SIDEBAR_NAV_ITEMS): NavItem[] {
+    // Track signal dependencies for sidebar computed().
+    this.permissions.permissions();
+    this.featureAccess.modules();
+
     return source
       .map((item) => this.filterItem(item))
       .filter((item): item is NavItem => item != null);
   }
 
+  /**
+   * Route prefixes that belong to a module (for disable redirect).
+   */
+  getRoutePrefixesForModule(moduleCode: string): string[] {
+    return SIDEBAR_NAV_ITEMS.filter(
+      (item) => item.moduleCode === moduleCode && !!item.route
+    ).map((item) => item.route!);
+  }
+
+  getRoutePrefixesForFeature(featureCode: string): string[] {
+    return SIDEBAR_NAV_ITEMS.filter(
+      (item) => item.featureCode === featureCode && !!item.route
+    ).map((item) => item.route!);
+  }
+
   private filterItem(item: NavItem): NavItem | null {
+    if (item.moduleCode && !this.featureAccess.isModuleEnabled(item.moduleCode)) {
+      return null;
+    }
+
+    if (item.featureCode && !this.featureAccess.isFeatureEnabled(item.featureCode)) {
+      return null;
+    }
+
+    // Soon placeholder — visible only if module/feature gates passed.
     if (!item.enabled) {
       return item;
     }
 
     if (item.anyPermissions?.length && !this.permissions.hasAnyPermission(item.anyPermissions)) {
       return null;
+    }
+
+    if (item.children?.length) {
+      const children = item.children
+        .map((child) => this.filterItem(child))
+        .filter((child): child is NavItem => child != null);
+      return { ...item, children };
     }
 
     return item;

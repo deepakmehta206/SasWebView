@@ -1,0 +1,59 @@
+<section class="feature-list">
+  <app-page-header title="Features" subtitle="Platform feature catalog.">
+    <ng-container *appHasPermission="permissionCodes.FeatureAdd">
+      <a class="btn btn--primary" routerLink="/features/new">Add feature</a>
+    </ng-container>
+  </app-page-header>
+
+  <app-ui-card title="Feature list">
+    <div class="filters">
+      <label class="form-field">
+        <span class="form-label">Search</span>
+        <input class="form-input" type="search" [formControl]="searchControl" />
+      </label>
+      <label class="form-field">
+        <span class="form-label">Module</span>
+        <select class="form-input" [formControl]="moduleFilter">
+          <option value="">All modules</option>
+          @for (module of modules(); track module.moduleId) {
+            <option [value]="module.moduleId">{{ module.moduleCode }}</option>
+          }
+        </select>
+      </label>
+      <label class="check-field">
+        <input type="checkbox" [formControl]="includeInactive" />
+        <span>Include inactive</span>
+      </label>
+    </div>
+    @if (errorMessage()) { <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div> }
+    @if (loading()) {
+      <app-loading-indicator label="Loading features…" />
+    } @else if (filtered().length === 0) {
+      <app-empty-state title="No features found" message="Try adjusting filters." />
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Code</th><th>Name</th><th>Module</th><th>Order</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            @for (feature of filtered(); track feature.featureId) {
+              <tr>
+                <td>{{ feature.featureCode }}</td>
+                <td>{{ feature.featureName }}</td>
+                <td>{{ feature.moduleCode }}</td>
+                <td>{{ feature.displayOrder }}</td>
+                <td>{{ feature.isActive ? 'Active' : 'Inactive' }}</td>
+                <td class="data-table__actions">
+                  <ng-container *appHasPermission="permissionCodes.FeatureEdit">
+                    <a class="btn btn--secondary btn--compact" [routerLink]="['/features', feature.featureId, 'edit']">Edit</a>
+                  </ng-container>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+</section>

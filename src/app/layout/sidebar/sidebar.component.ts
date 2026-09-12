@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, computed, inject } from '@angul
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NavigationService, NavItem } from '../../core/constants/nav.config';
 import { PermissionService } from '../../core/permissions/permission.service';
+import { FeatureAccessService } from '../../core/entitlements/feature-access.service';
 import { APP_NAME } from '../../core/constants/app.constants';
 
 @Component({
@@ -14,15 +15,17 @@ import { APP_NAME } from '../../core/constants/app.constants';
 export class SidebarComponent {
   private readonly navigation = inject(NavigationService);
   private readonly permissions = inject(PermissionService);
+  private readonly featureAccess = inject(FeatureAccessService);
 
   readonly appName = APP_NAME;
 
   /**
-   * Permission-aware nav. Reads PermissionService so the list updates after login.
-   * Filtering lives in NavigationService — not inline permission checks here.
+   * Permission + feature-aware nav.
+   * Filtering lives in NavigationService — not inline checks here.
    */
   readonly navItems = computed(() => {
     this.permissions.permissions();
+    this.featureAccess.modules();
     return this.navigation.getVisibleNavItems();
   });
 
