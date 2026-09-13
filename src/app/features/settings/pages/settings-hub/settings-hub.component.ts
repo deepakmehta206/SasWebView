@@ -64,6 +64,12 @@ export class SettingsHubComponent {
       description: 'Upload, download, and soft-delete tenant files.',
       route: '/settings/files',
       anyPermissions: [PermissionCodes.FileView]
+    },
+    {
+      title: 'Audit & Activity',
+      description: 'View tenant activity and security events.',
+      route: '/settings/audit',
+      anyPermissions: [PermissionCodes.AuditView]
     }
   ];
 

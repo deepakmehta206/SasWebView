@@ -234,6 +234,10 @@ export class ShellComponent {
       return 'Files';
     }
 
+    if (url.startsWith('/settings/audit')) {
+      return 'Audit & Activity';
+    }
+
     if (url.startsWith('/settings')) {
       return 'Settings';
     }

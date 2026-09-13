@@ -87,5 +87,21 @@ export const SETTINGS_ROUTES: Routes = [
     data: { permission: PermissionCodes.FileView },
     loadComponent: () =>
       import('../files/pages/file-list/file-list.component').then((m) => m.FileListComponent)
+  },
+  {
+    path: 'audit',
+    canActivate: [permissionGuard],
+    data: { permission: PermissionCodes.AuditView },
+    loadComponent: () =>
+      import('../audit/pages/audit-list/audit-list.component').then((m) => m.AuditListComponent)
+  },
+  {
+    path: 'audit/:auditLogId',
+    canActivate: [permissionGuard],
+    data: { permission: PermissionCodes.AuditView },
+    loadComponent: () =>
+      import('../audit/pages/audit-detail/audit-detail.component').then(
+        (m) => m.AuditDetailComponent
+      )
   }
 ];

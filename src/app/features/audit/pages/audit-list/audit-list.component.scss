@@ -1,0 +1,130 @@
+.audit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.audit-list__filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.85rem 1rem;
+  align-items: end;
+}
+
+.audit-list__filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  grid-column: 1 / -1;
+}
+
+.audit-list__desc {
+  max-width: 18rem;
+  word-break: break-word;
+}
+
+.audit-list__more {
+  margin-top: 1rem;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 52rem;
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.75rem 0.9rem;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.data-table th {
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--color-text-muted);
+  background: var(--color-surface-muted);
+}
+
+.data-table__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.6rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 650;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+}
+
+.status-pill--accent {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  border-color: transparent;
+}
+
+.status-pill--security {
+  background: color-mix(in srgb, var(--color-danger, #b42318) 12%, white);
+  color: var(--color-danger, #b42318);
+  border-color: transparent;
+}
+
+.status-pill--file {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  border-color: transparent;
+}
+
+.status-pill--hrms {
+  background: color-mix(in srgb, var(--color-success, #067647) 14%, white);
+  color: var(--color-success, #067647);
+  border-color: transparent;
+}
+
+.status-pill--user {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+
+.btn--sm {
+  font-size: 0.8rem;
+  padding: 0.3rem 0.55rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 800px) {
+  .data-table th:nth-child(4),
+  .data-table td:nth-child(4),
+  .data-table th:nth-child(7),
+  .data-table td:nth-child(7) {
+    display: none;
+  }
+}

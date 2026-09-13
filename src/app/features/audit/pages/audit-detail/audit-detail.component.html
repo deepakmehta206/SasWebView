@@ -1,0 +1,88 @@
+<section class="audit-detail">
+  <app-page-header title="Audit & Activity" subtitle="Read-only event details.">
+    <a class="btn btn--ghost" routerLink="/settings/audit">Back to Audit List</a>
+  </app-page-header>
+
+  @if (errorMessage()) {
+    <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+  }
+
+  @if (loading()) {
+    <app-ui-card>
+      <app-loading-indicator label="Loading audit log…" />
+    </app-ui-card>
+  } @else if (!row()) {
+    <app-ui-card>
+      <app-empty-state
+        title="Audit log not found."
+        message="The record may not exist or is not available for this tenant."
+      />
+      <a class="btn btn--secondary audit-detail__back" routerLink="/settings/audit">
+        Back to Audit List
+      </a>
+    </app-ui-card>
+  } @else {
+    <app-ui-card title="Event">
+      <dl class="audit-detail__grid">
+        <div>
+          <dt>Date / time</dt>
+          <dd>{{ formatDate(row()!.createdDate) }}</dd>
+        </div>
+        <div>
+          <dt>Category</dt>
+          <dd>
+            <span [class]="'status-pill ' + pillClass(row()!.category)">
+              {{ formatCategory(row()!.category) }}
+            </span>
+          </dd>
+        </div>
+        <div>
+          <dt>Action</dt>
+          <dd>{{ formatAction(row()!.action) }}</dd>
+        </div>
+        <div class="audit-detail__full">
+          <dt>Description</dt>
+          <dd>{{ row()!.description || '—' }}</dd>
+        </div>
+        <div>
+          <dt>User ID</dt>
+          <dd>{{ row()!.userId ?? '—' }}</dd>
+        </div>
+        <div>
+          <dt>Branch ID</dt>
+          <dd>{{ row()!.branchId ?? '—' }}</dd>
+        </div>
+        <div>
+          <dt>Entity</dt>
+          <dd>{{ formatEntity(row()!.entityType, row()!.entityId) }}</dd>
+        </div>
+        <div>
+          <dt>IP address</dt>
+          <dd>{{ row()!.ipAddress || '—' }}</dd>
+        </div>
+        <div class="audit-detail__full">
+          <dt>User agent</dt>
+          <dd class="audit-detail__wrap">{{ row()!.userAgent || '—' }}</dd>
+        </div>
+        <div class="audit-detail__full">
+          <dt>Correlation ID</dt>
+          <dd>{{ row()!.correlationId || '—' }}</dd>
+        </div>
+        @if (row()!.tenantId != null) {
+          <div class="audit-detail__muted">
+            <dt>Tenant ID</dt>
+            <dd>{{ row()!.tenantId }}</dd>
+          </div>
+        }
+      </dl>
+    </app-ui-card>
+
+    <app-ui-card title="Old values">
+      <pre class="audit-detail__json">{{ formatJson(row()!.oldValuesJson) }}</pre>
+    </app-ui-card>
+
+    <app-ui-card title="New values">
+      <pre class="audit-detail__json">{{ formatJson(row()!.newValuesJson) }}</pre>
+    </app-ui-card>
+  }
+</section>

@@ -1,0 +1,130 @@
+<section class="audit-list">
+  <app-page-header
+    title="Audit & Activity"
+    subtitle="View tenant activity and security events."
+  >
+    <a class="btn btn--ghost" routerLink="/settings">Back to Settings</a>
+    <button type="button" class="btn btn--ghost" (click)="reload()" [disabled]="loading()">
+      Refresh
+    </button>
+  </app-page-header>
+
+  @if (errorMessage()) {
+    <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+  }
+
+  <app-ui-card title="Filters">
+    <form class="audit-list__filters" [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+      <label class="form-field">
+        <span class="form-label">From date</span>
+        <input class="form-input" type="date" formControlName="fromDate" />
+      </label>
+      <label class="form-field">
+        <span class="form-label">To date</span>
+        <input class="form-input" type="date" formControlName="toDate" />
+      </label>
+      <label class="form-field">
+        <span class="form-label">Category</span>
+        <select class="form-input" formControlName="category" (change)="onCategoryChange()">
+          <option value="">All</option>
+          @for (category of categories; track category) {
+            <option [value]="category">{{ formatCategory(category) }}</option>
+          }
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Action</span>
+        <select class="form-input" formControlName="action">
+          <option value="">All</option>
+          @for (action of actionOptions; track action) {
+            <option [value]="action">{{ formatAction(action) }}</option>
+          }
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Entity type</span>
+        <input class="form-input" type="text" formControlName="entityType" placeholder="e.g. User" />
+      </label>
+      <label class="form-field">
+        <span class="form-label">Entity ID</span>
+        <input class="form-input" type="text" formControlName="entityId" />
+      </label>
+      <label class="form-field">
+        <span class="form-label">User ID</span>
+        <input class="form-input" type="number" formControlName="userId" min="1" />
+      </label>
+      <div class="audit-list__filter-actions">
+        <button type="submit" class="btn btn--primary" [disabled]="loading()">Apply</button>
+        <button type="button" class="btn btn--secondary" (click)="clearFilters()" [disabled]="loading()">
+          Clear
+        </button>
+      </div>
+    </form>
+  </app-ui-card>
+
+  <app-ui-card>
+    @if (loading() && rows().length === 0) {
+      <app-loading-indicator label="Loading audit logs…" />
+    } @else if (rows().length === 0) {
+      <app-empty-state
+        title="No audit events found."
+        message="Try adjusting filters or check back after activity occurs."
+      />
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th scope="col">Created</th>
+              <th scope="col">Category</th>
+              <th scope="col">Action</th>
+              <th scope="col">Description</th>
+              <th scope="col">User</th>
+              <th scope="col">Entity</th>
+              <th scope="col">IP</th>
+              <th scope="col"><span class="visually-hidden">View</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.auditLogId) {
+              <tr>
+                <td>{{ formatDate(row.createdDate) }}</td>
+                <td>
+                  <span [class]="'status-pill ' + pillClass(row.category)">
+                    {{ formatCategory(row.category) }}
+                  </span>
+                </td>
+                <td>{{ formatAction(row.action) }}</td>
+                <td class="audit-list__desc">{{ row.description || '—' }}</td>
+                <td>{{ row.userId ?? '—' }}</td>
+                <td>{{ formatEntity(row.entityType, row.entityId) }}</td>
+                <td>{{ row.ipAddress || '—' }}</td>
+                <td class="data-table__actions">
+                  <a
+                    class="btn btn--ghost btn--sm"
+                    [routerLink]="['/settings/audit', row.auditLogId]"
+                  >
+                    View
+                  </a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (hasMore()) {
+        <div class="audit-list__more">
+          <button
+            type="button"
+            class="btn btn--secondary"
+            (click)="loadMore()"
+            [disabled]="loading()"
+          >
+            {{ loading() ? 'Loading…' : 'Load more' }}
+          </button>
+        </div>
+      }
+    }
+  </app-ui-card>
+</section>

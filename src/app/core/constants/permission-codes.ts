@@ -69,7 +69,9 @@ export const PermissionCodes = {
 
   FileView: 'FILE_VIEW',
   FileUpload: 'FILE_UPLOAD',
-  FileDelete: 'FILE_DELETE'
+  FileDelete: 'FILE_DELETE',
+
+  AuditView: 'AUDIT_VIEW'
 } as const;
 
 export type PermissionCode = (typeof PermissionCodes)[keyof typeof PermissionCodes];
