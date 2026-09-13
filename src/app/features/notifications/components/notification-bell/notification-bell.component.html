@@ -1,0 +1,84 @@
+<div class="notification-bell" *appHasPermission="permissionCodes.NotificationView">
+  <button
+    type="button"
+    class="notification-bell__trigger"
+    (click)="toggle(); $event.stopPropagation()"
+    [attr.aria-expanded]="open()"
+    aria-haspopup="true"
+    [attr.aria-label]="
+      state.hasUnread()
+        ? 'Notifications, ' + state.unreadBadgeLabel() + ' unread'
+        : 'Notifications'
+    "
+  >
+    <span class="notification-bell__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5" />
+        <path d="M9 17a3 3 0 0 0 6 0" />
+      </svg>
+    </span>
+    @if (state.unreadBadgeLabel()) {
+      <span class="notification-bell__badge" aria-hidden="true">{{ state.unreadBadgeLabel() }}</span>
+    }
+  </button>
+
+  @if (open()) {
+    <div class="notification-bell__panel" role="menu" (click)="$event.stopPropagation()">
+      <div class="notification-bell__header">
+        <strong>Notifications</strong>
+        @if (state.hasUnread()) {
+          <button
+            type="button"
+            class="btn btn--ghost btn--sm"
+            (click)="markAllRead()"
+            [disabled]="markingAll()"
+          >
+            Mark all read
+          </button>
+        }
+      </div>
+
+      @if (actionError()) {
+        <p class="notification-bell__error" role="alert">{{ actionError() }}</p>
+      }
+
+      @if (state.loading() && state.notifications().length === 0) {
+        <p class="notification-bell__empty">Loading…</p>
+      } @else if (state.notifications().length === 0) {
+        <p class="notification-bell__empty">No notifications yet.</p>
+      } @else {
+        <ul class="notification-bell__list">
+          @for (item of state.notifications(); track item.notificationId) {
+            <li [class.notification-bell__item--unread]="!item.isRead">
+              <a
+                [routerLink]="['/notifications', item.notificationId]"
+                role="menuitem"
+                (click)="close()"
+              >
+                <span class="notification-bell__title">
+                  {{ item.title }}
+                  @if (!item.isRead) {
+                    <span class="notification-bell__unread-label">Unread</span>
+                  }
+                </span>
+                <span class="notification-bell__meta">
+                  {{ formatType(item.notificationType) }} · {{ formatDate(item.createdDate) }}
+                </span>
+                <span class="notification-bell__message">{{ item.message }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+
+      <a
+        class="notification-bell__footer"
+        routerLink="/notifications"
+        role="menuitem"
+        (click)="close()"
+      >
+        View all notifications
+      </a>
+    </div>
+  }
+</div>

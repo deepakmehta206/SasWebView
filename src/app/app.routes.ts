@@ -42,7 +42,11 @@ export const routes: Routes = [
         path: 'settings',
         canActivate: [permissionGuard],
         data: {
-          anyPermissions: [PermissionCodes.TenantView, PermissionCodes.SettingsView]
+          anyPermissions: [
+            PermissionCodes.TenantView,
+            PermissionCodes.SettingsView,
+            PermissionCodes.NotificationTemplateView
+          ]
         },
         loadChildren: () =>
           import('./features/settings/settings.routes').then((m) => m.SETTINGS_ROUTES)
@@ -80,6 +84,11 @@ export const routes: Routes = [
       {
         path: 'hrms',
         loadChildren: () => import('./features/hrms/hrms.routes').then((m) => m.HRMS_ROUTES)
+      },
+      {
+        path: 'notifications',
+        loadChildren: () =>
+          import('./features/notifications/notifications.routes').then((m) => m.NOTIFICATIONS_ROUTES)
       },
       {
         path: 'profile',

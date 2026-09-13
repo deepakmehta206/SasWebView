@@ -1,0 +1,41 @@
+.template-form__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+}
+
+.template-form__full {
+  grid-column: 1 / -1;
+}
+
+.template-form__body {
+  min-height: 10rem;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.template-form__actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.template-form__readonly {
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.9rem;
+  background: var(--color-surface-muted);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+}
+
+.form-field--checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-hint {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}

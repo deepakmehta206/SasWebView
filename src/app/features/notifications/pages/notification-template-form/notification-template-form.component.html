@@ -1,0 +1,85 @@
+<section class="template-form">
+  <app-page-header
+    [title]="isCreate() ? 'New notification template' : 'Edit notification template'"
+    subtitle="Template text only — no provider secrets."
+  >
+    <a class="btn btn--ghost" routerLink="/settings/notification-templates">Back to templates</a>
+  </app-page-header>
+
+  @if (errorMessage()) {
+    <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+  }
+
+  @if (loading()) {
+    <app-ui-card>
+      <app-loading-indicator label="Loading template…" />
+    </app-ui-card>
+  } @else {
+    <app-ui-card>
+      @if (!canMutate() && !isCreate()) {
+        <p class="template-form__readonly" role="status">
+          This system template is read-only for your account.
+        </p>
+      }
+
+      <form class="template-form__grid" [formGroup]="form" (ngSubmit)="submit()">
+        <label class="form-field">
+          <span class="form-label">Template code</span>
+          <input class="form-input" formControlName="templateCode" autocomplete="off" />
+        </label>
+
+        <label class="form-field">
+          <span class="form-label">Channel</span>
+          <select class="form-input" formControlName="channel">
+            @for (channel of channels; track channel) {
+              <option [value]="channel">{{ formatChannel(channel) }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="form-field">
+          <span class="form-label">Language</span>
+          <input class="form-input" formControlName="language" autocomplete="off" />
+        </label>
+
+        <label class="form-field template-form__full">
+          <span class="form-label">Subject</span>
+          <input class="form-input" formControlName="subject" autocomplete="off" />
+        </label>
+
+        <label class="form-field template-form__full">
+          <span class="form-label">Body</span>
+          <textarea class="form-input template-form__body" formControlName="body" rows="8"></textarea>
+        </label>
+
+        <label class="form-field template-form__full">
+          <span class="form-label">Provider template name (WhatsApp)</span>
+          <input class="form-input" formControlName="providerTemplateName" autocomplete="off" />
+          <span class="form-hint">External WhatsApp template key only — not an API token or secret.</span>
+        </label>
+
+        @if (!isCreate()) {
+          <label class="form-field form-field--checkbox">
+            <input type="checkbox" formControlName="isActive" />
+            <span>Active</span>
+          </label>
+        }
+
+        @if (isCreate() && isPlatformAdmin()) {
+          <label class="form-field form-field--checkbox">
+            <input type="checkbox" formControlName="isSystemTemplate" />
+            <span>Create as system template</span>
+          </label>
+        }
+
+        @if (canMutate()) {
+          <div class="template-form__actions template-form__full">
+            <button type="submit" class="btn btn--primary" [disabled]="saving()">
+              {{ isCreate() ? 'Create template' : 'Save changes' }}
+            </button>
+          </div>
+        }
+      </form>
+    </app-ui-card>
+  }
+</section>

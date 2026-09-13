@@ -59,7 +59,13 @@ export const PermissionCodes = {
   PayrollProcess: 'PAYROLL_PROCESS',
   PayrollApprove: 'PAYROLL_APPROVE',
   PayrollLock: 'PAYROLL_LOCK',
-  PayslipView: 'PAYSLIP_VIEW'
+  PayslipView: 'PAYSLIP_VIEW',
+
+  NotificationView: 'NOTIFICATION_VIEW',
+  NotificationManage: 'NOTIFICATION_MANAGE',
+  NotificationTemplateView: 'NOTIFICATION_TEMPLATE_VIEW',
+  NotificationTemplateManage: 'NOTIFICATION_TEMPLATE_MANAGE',
+  NotificationPreferenceEdit: 'NOTIFICATION_PREFERENCE_EDIT'
 } as const;
 
 export type PermissionCode = (typeof PermissionCodes)[keyof typeof PermissionCodes];

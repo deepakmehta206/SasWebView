@@ -1,8 +1,9 @@
 import { Routes } from '@angular/router';
+import { permissionGuard } from '../../core/guards/permission.guard';
+import { PermissionCodes } from '../../core/constants/permission-codes';
 
 /**
  * Settings feature routes.
- * Structure is guard-ready; authorization guards will be added in Phase 3+.
  */
 export const SETTINGS_ROUTES: Routes = [
   {
@@ -51,6 +52,33 @@ export const SETTINGS_ROUTES: Routes = [
     loadComponent: () =>
       import('../features/pages/tenant-features/tenant-features.component').then(
         (m) => m.TenantFeaturesComponent
+      )
+  },
+  {
+    path: 'notification-templates',
+    canActivate: [permissionGuard],
+    data: { permission: PermissionCodes.NotificationTemplateView },
+    loadComponent: () =>
+      import('../notifications/pages/notification-template-list/notification-template-list.component').then(
+        (m) => m.NotificationTemplateListComponent
+      )
+  },
+  {
+    path: 'notification-templates/new',
+    canActivate: [permissionGuard],
+    data: { permission: PermissionCodes.NotificationTemplateManage },
+    loadComponent: () =>
+      import('../notifications/pages/notification-template-form/notification-template-form.component').then(
+        (m) => m.NotificationTemplateFormComponent
+      )
+  },
+  {
+    path: 'notification-templates/:templateId/edit',
+    canActivate: [permissionGuard],
+    data: { permission: PermissionCodes.NotificationTemplateView },
+    loadComponent: () =>
+      import('../notifications/pages/notification-template-form/notification-template-form.component').then(
+        (m) => m.NotificationTemplateFormComponent
       )
   }
 ];

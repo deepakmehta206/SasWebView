@@ -1,0 +1,75 @@
+<section class="notification-list">
+  <app-page-header title="Notifications" subtitle="Your in-app notification inbox.">
+    <a
+      class="btn btn--ghost"
+      routerLink="/notifications/preferences"
+      *appHasPermission="permissionCodes.NotificationView"
+    >
+      Preferences
+    </a>
+    @if (state.hasUnread()) {
+      <button
+        type="button"
+        class="btn btn--secondary"
+        (click)="markAllRead()"
+        [disabled]="markingAll()"
+      >
+        Mark all as read
+      </button>
+    }
+    <button type="button" class="btn btn--ghost" (click)="reload()">Refresh</button>
+  </app-page-header>
+
+  @if (actionError() || state.error()) {
+    <div class="alert alert--danger" role="alert">{{ actionError() || state.error() }}</div>
+  }
+
+  <app-ui-card>
+    @if (state.loading()) {
+      <app-loading-indicator label="Loading notifications…" />
+    } @else if (state.notifications().length === 0) {
+      <app-empty-state
+        title="No notifications yet."
+        message="When the platform sends you alerts, they will appear here."
+      />
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th scope="col">Status</th>
+              <th scope="col">Title</th>
+              <th scope="col">Type</th>
+              <th scope="col">Created</th>
+              <th scope="col"><span class="visually-hidden">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of state.notifications(); track item.notificationId) {
+              <tr [class.notification-list__row--unread]="!item.isRead">
+                <td>
+                  @if (item.isRead) {
+                    <span class="status-pill">Read</span>
+                  } @else {
+                    <span class="status-pill status-pill--accent">Unread</span>
+                  }
+                </td>
+                <td>
+                  <div class="notification-list__title">{{ item.title }}</div>
+                  <div class="notification-list__message">{{ item.message }}</div>
+                </td>
+                <td>{{ formatType(item.notificationType) }}</td>
+                <td>{{ formatDate(item.createdDate) }}</td>
+                <td>
+                  <a class="btn btn--ghost btn--sm" [routerLink]="['/notifications', item.notificationId]">
+                    Open
+                  </a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+</section>

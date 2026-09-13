@@ -1,0 +1,85 @@
+<section class="notification-preferences">
+  <app-page-header
+    title="Notification preferences"
+    subtitle="Choose which channels you want for each notification type."
+  >
+    <a class="btn btn--ghost" routerLink="/notifications">Back to inbox</a>
+    <button
+      type="button"
+      class="btn btn--primary"
+      (click)="save()"
+      [disabled]="saving() || !canEdit()"
+      *appHasPermission="permissionCodes.NotificationPreferenceEdit"
+    >
+      Save preferences
+    </button>
+  </app-page-header>
+
+  @if (errorMessage()) {
+    <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+  }
+  @if (successMessage()) {
+    <div class="alert alert--success" role="status">{{ successMessage() }}</div>
+  }
+
+  <app-ui-card>
+    @if (loading()) {
+      <app-loading-indicator label="Loading preferences…" />
+    } @else if (rows().length === 0) {
+      <app-empty-state
+        title="No preferences available."
+        message="Preference options will appear when the notification catalog is configured."
+      />
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table preference-matrix">
+          <thead>
+            <tr>
+              <th scope="col">Notification type</th>
+              @for (channel of channelOrder; track channel) {
+                <th scope="col">{{ formatChannel(channel) }}</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.notificationType) {
+              <tr>
+                <th scope="row">
+                  {{ row.typeLabel }}
+                  @if (row.channels[channelOrder[0]].mandatory) {
+                    <span class="preference-matrix__mandatory">Required</span>
+                  }
+                </th>
+                @for (channel of channelOrder; track channel) {
+                  <td>
+                    @if (row.channels[channel]; as cell) {
+                      <label class="preference-matrix__toggle">
+                        <input
+                          type="checkbox"
+                          [checked]="cell.enabled"
+                          [disabled]="!canEdit() || cell.mandatory || saving()"
+                          (change)="toggle(row.notificationType, channel, $any($event.target).checked)"
+                          [attr.aria-label]="row.typeLabel + ' via ' + formatChannel(channel)"
+                        />
+                        <span class="visually-hidden">{{ formatChannel(channel) }}</span>
+                      </label>
+                      @if (cell.mandatory) {
+                        <span class="preference-matrix__hint">Cannot disable</span>
+                      }
+                    } @else {
+                      —
+                    }
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="preference-matrix__note">
+        Required security notifications (for example password reset) cannot be turned off.
+        The server enforces this rule.
+      </p>
+    }
+  </app-ui-card>
+</section>

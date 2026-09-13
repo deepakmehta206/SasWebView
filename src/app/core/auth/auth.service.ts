@@ -19,6 +19,7 @@ import { PermissionService } from '../permissions/permission.service';
 import { BranchContextService } from '../../features/branch/services/branch-context.service';
 import { TenantContextService } from '../../features/tenant/services/tenant-context.service';
 import { FeatureAccessService } from '../entitlements/feature-access.service';
+import { NotificationStateService } from '../notifications/notification-state.service';
 import { SubscriptionService } from '../../features/subscription/services/subscription.service';
 import { AuthStateService, AuthUser } from './auth-state.service';
 import {
@@ -43,6 +44,7 @@ export class AuthService {
   private readonly permissions = inject(PermissionService);
   private readonly featureAccess = inject(FeatureAccessService);
   private readonly subscription = inject(SubscriptionService);
+  private readonly notificationState = inject(NotificationStateService);
   private readonly tenantContext = inject(TenantContextService);
   private readonly branchContext = inject(BranchContextService);
   private readonly router = inject(Router);
@@ -215,6 +217,7 @@ export class AuthService {
     this.permissions.clear();
     this.featureAccess.clear();
     this.subscription.clear();
+    this.notificationState.clear();
     this.tenantContext.clearAuthenticatedTenant();
     this.branchContext.clearSession();
   }
@@ -230,6 +233,7 @@ export class AuthService {
     this.permissions.setPermissions(data.user.permissions);
     this.hydrateTenantAndBranch(data.user);
     this.featureAccess.load().subscribe();
+    this.notificationState.hydrateAfterAuth();
   }
 
   private applyCurrentUser(user: CurrentUserDto): void {
@@ -237,6 +241,7 @@ export class AuthService {
     this.permissions.setPermissions(user.permissions);
     this.hydrateTenantAndBranch(user);
     this.featureAccess.load().subscribe();
+    this.notificationState.hydrateAfterAuth();
   }
 
   private hydrateTenantAndBranch(user: AuthUser): void {

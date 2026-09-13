@@ -4,11 +4,12 @@ import { APP_NAME } from '../../core/constants/app.constants';
 import { AuthService } from '../../core/auth/auth.service';
 import { AuthStateService } from '../../core/auth/auth-state.service';
 import { BranchSelectorComponent } from '../../features/branch/components/branch-selector/branch-selector.component';
+import { NotificationBellComponent } from '../../features/notifications/components/notification-bell/notification-bell.component';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [BranchSelectorComponent, RouterLink],
+  imports: [BranchSelectorComponent, NotificationBellComponent, RouterLink],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })

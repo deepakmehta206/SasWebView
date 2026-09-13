@@ -1,0 +1,30 @@
+.notification-detail__meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.75rem 1.25rem;
+  margin: 0 0 1.25rem;
+}
+
+.notification-detail__meta div {
+  margin: 0;
+}
+
+.notification-detail__meta dt {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-text-muted);
+  margin: 0 0 0.2rem;
+}
+
+.notification-detail__meta dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.notification-detail__message {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.5;
+}

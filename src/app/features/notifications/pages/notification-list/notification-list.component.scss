@@ -1,0 +1,54 @@
+.notification-list__row--unread {
+  background: color-mix(in srgb, var(--color-primary-soft) 40%, transparent);
+}
+
+.notification-list__title {
+  font-weight: 650;
+  word-break: break-word;
+}
+
+.notification-list__message {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  word-break: break-word;
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+}
+
+.status-pill--accent {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.btn--sm {
+  font-size: 0.8rem;
+  padding: 0.3rem 0.55rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 700px) {
+  .data-table th:nth-child(3),
+  .data-table td:nth-child(3) {
+    display: none;
+  }
+}

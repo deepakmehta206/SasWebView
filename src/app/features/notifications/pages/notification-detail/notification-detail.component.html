@@ -1,0 +1,46 @@
+<section class="notification-detail">
+  <app-page-header title="Notification" subtitle="Message details.">
+    <a class="btn btn--ghost" routerLink="/notifications">Back to inbox</a>
+  </app-page-header>
+
+  @if (errorMessage()) {
+    <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+  }
+
+  @if (loading()) {
+    <app-ui-card>
+      <app-loading-indicator label="Loading notification…" />
+    </app-ui-card>
+  } @else if (item()) {
+    <app-ui-card [title]="item()!.title">
+      <dl class="notification-detail__meta">
+        <div>
+          <dt>Status</dt>
+          <dd>{{ item()!.isRead ? 'Read' : 'Unread' }}</dd>
+        </div>
+        <div>
+          <dt>Type</dt>
+          <dd>{{ formatType(item()!.notificationType) }}</dd>
+        </div>
+        <div>
+          <dt>Created</dt>
+          <dd>{{ formatDate(item()!.createdDate) }}</dd>
+        </div>
+        @if (item()!.readDate) {
+          <div>
+            <dt>Read</dt>
+            <dd>{{ formatDate(item()!.readDate) }}</dd>
+          </div>
+        }
+        @if (item()!.sourceType) {
+          <div>
+            <dt>Source</dt>
+            <dd>{{ item()!.sourceType }}{{ item()!.sourceId ? ' #' + item()!.sourceId : '' }}</dd>
+          </div>
+        }
+      </dl>
+
+      <p class="notification-detail__message">{{ item()!.message }}</p>
+    </app-ui-card>
+  }
+</section>

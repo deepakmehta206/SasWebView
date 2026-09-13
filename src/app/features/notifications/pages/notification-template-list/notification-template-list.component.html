@@ -1,0 +1,115 @@
+<section class="template-list">
+  <app-page-header
+    title="Notification templates"
+    subtitle="Manage message templates by channel. Provider credentials are not configured here."
+  >
+    <a class="btn btn--ghost" routerLink="/settings">Back to settings</a>
+    <a
+      class="btn btn--primary"
+      routerLink="/settings/notification-templates/new"
+      *appHasPermission="permissionCodes.NotificationTemplateManage"
+    >
+      New template
+    </a>
+  </app-page-header>
+
+  @if (errorMessage()) {
+    <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+  }
+
+  <app-ui-card title="Filters">
+    <form class="filter-row" [formGroup]="filterForm" (ngSubmit)="load()">
+      <label class="form-field">
+        <span class="form-label">Channel</span>
+        <select class="form-input" formControlName="channel">
+          <option value="">All</option>
+          @for (channel of channels; track channel) {
+            <option [value]="channel">{{ formatChannel(channel) }}</option>
+          }
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Status</span>
+        <select class="form-input" formControlName="isActive">
+          <option value="">All</option>
+          <option value="true">Active</option>
+          <option value="false">Inactive</option>
+        </select>
+      </label>
+      <button type="submit" class="btn btn--secondary">Apply</button>
+    </form>
+  </app-ui-card>
+
+  <app-ui-card>
+    @if (loading()) {
+      <app-loading-indicator label="Loading templates…" />
+    } @else if (rows().length === 0) {
+      <app-empty-state title="No templates found." message="Create a tenant template or adjust filters." />
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th scope="col">Code</th>
+              <th scope="col">Channel</th>
+              <th scope="col">Language</th>
+              <th scope="col">Scope</th>
+              <th scope="col">Active</th>
+              <th scope="col">Modified</th>
+              <th scope="col"><span class="visually-hidden">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.templateId) {
+              <tr>
+                <td>{{ row.templateCode }}</td>
+                <td>{{ formatChannel(row.channel) }}</td>
+                <td>{{ row.language }}</td>
+                <td>
+                  @if (isSystem(row)) {
+                    <span class="status-pill">System</span>
+                  } @else {
+                    <span class="status-pill status-pill--accent">Tenant</span>
+                  }
+                </td>
+                <td>{{ row.isActive ? 'Yes' : 'No' }}</td>
+                <td>{{ formatDate(row.modifiedDate || row.createdDate) }}</td>
+                <td class="template-list__actions">
+                  <a
+                    class="btn btn--ghost btn--sm"
+                    [routerLink]="['/settings/notification-templates', row.templateId, 'edit']"
+                  >
+                    {{ canEdit(row) ? 'Edit' : 'View' }}
+                  </a>
+                  <ng-container *appHasPermission="permissionCodes.NotificationTemplateManage">
+                    @if (canEdit(row)) {
+                      @if (row.isActive) {
+                        <button
+                          type="button"
+                          class="btn btn--ghost btn--sm"
+                          [disabled]="actingId() === row.templateId"
+                          (click)="setActive(row, false)"
+                        >
+                          Deactivate
+                        </button>
+                      } @else {
+                        <button
+                          type="button"
+                          class="btn btn--ghost btn--sm"
+                          [disabled]="actingId() === row.templateId"
+                          (click)="setActive(row, true)"
+                        >
+                          Activate
+                        </button>
+                      }
+                    }
+                  </ng-container>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+</section>
