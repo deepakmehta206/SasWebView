@@ -1,0 +1,94 @@
+<section class="page">
+  <app-page-header title="Items">
+    <ng-container *appHasPermission="permissionCodes.InventoryItemManage">
+      <a class="btn btn--primary" routerLink="new">Add</a>
+    </ng-container>
+  </app-page-header>
+  <app-ui-card title="Items">
+    <form class="filters" [formGroup]="filters" (ngSubmit)="load()">
+      <label class="form-field">
+        <span class="form-label">Category</span>
+        <select class="form-input" formControlName="categoryId">
+          <option [ngValue]="null">All</option>
+          @for (category of categories(); track category.categoryId) {
+            <option [ngValue]="category.categoryId">{{ category.categoryName }}</option>
+          }
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Brand</span>
+        <select class="form-input" formControlName="brandId">
+          <option [ngValue]="null">All</option>
+          @for (brand of brands(); track brand.brandId) {
+            <option [ngValue]="brand.brandId">{{ brand.brandName }}</option>
+          }
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Type</span>
+        <select class="form-input" formControlName="itemType">
+          <option value="">All</option>
+          <option [value]="itemTypes.Goods">Goods</option>
+          <option [value]="itemTypes.Service">Service</option>
+          <option [value]="itemTypes.Consumable">Consumable</option>
+        </select>
+      </label>
+      <label class="form-check">
+        <input type="checkbox" formControlName="isActive" /><span>Active only</span>
+      </label>
+      <button class="btn btn--secondary" type="submit">Apply</button>
+    </form>
+
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else if (!rows().length) {
+      <app-empty-state title="No items" message="Nothing found.">
+        <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+      </app-empty-state>
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Cost</th>
+              <th>Price</th>
+              <th>Active</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.itemId) {
+              <tr>
+                <td>{{ row.itemCode }}</td>
+                <td>{{ row.itemName }}</td>
+                <td>{{ itemTypeLabel(row.itemType) }}</td>
+                <td>{{ row.costPrice }}</td>
+                <td>{{ row.sellingPrice }}</td>
+                <td>{{ row.isActive ? 'Yes' : 'No' }}</td>
+                <td class="data-table__actions">
+                  <ng-container *appHasPermission="permissionCodes.InventoryItemManage">
+                    <a class="btn btn--secondary" [routerLink]="[row.itemId, 'edit']">Edit</a>
+                    <button
+                      type="button"
+                      class="btn btn--secondary"
+                      [disabled]="statusBusyId() === row.itemId"
+                      (click)="toggleStatus(row)"
+                    >
+                      {{ row.isActive ? 'Deactivate' : 'Activate' }}
+                    </button>
+                  </ng-container>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+</section>

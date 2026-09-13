@@ -1,0 +1,56 @@
+<section class="page">
+  <app-page-header [title]="(isEdit() ? 'Edit' : 'Add') + ' supplier'">
+    <a class="btn btn--secondary" routerLink="/inventory/suppliers">Back</a>
+  </app-page-header>
+  <app-ui-card title="Details">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else {
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+        <label class="form-field">
+          <span class="form-label">Code</span>
+          <input class="form-input" formControlName="supplierCode" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Name</span>
+          <input class="form-input" formControlName="supplierName" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Contact person</span>
+          <input class="form-input" formControlName="contactPerson" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Email</span>
+          <input class="form-input" type="email" formControlName="email" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Phone</span>
+          <input class="form-input" formControlName="phone" />
+        </label>
+        <label class="form-field form-field--full">
+          <span class="form-label">Address</span>
+          <input class="form-input" formControlName="address" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Tax number</span>
+          <input class="form-input" formControlName="taxNumber" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Payment terms</span>
+          <input class="form-input" formControlName="paymentTerms" />
+        </label>
+        @if (isEdit()) {
+          <label class="form-check"><input type="checkbox" formControlName="isActive" /><span>Active</span></label>
+        }
+        <div class="form-actions">
+          <button class="btn btn--primary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Saving…' : 'Save' }}
+          </button>
+        </div>
+      </form>
+    }
+  </app-ui-card>
+</section>

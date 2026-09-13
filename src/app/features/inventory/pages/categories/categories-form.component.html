@@ -1,0 +1,45 @@
+<section class="page">
+  <app-page-header [title]="(isEdit() ? 'Edit' : 'Add') + ' category'">
+    <a class="btn btn--secondary" routerLink="/inventory/categories">Back</a>
+  </app-page-header>
+  <app-ui-card title="Details">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else {
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+        <label class="form-field">
+          <span class="form-label">Code</span>
+          <input class="form-input" formControlName="categoryCode" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Name</span>
+          <input class="form-input" formControlName="categoryName" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Parent category</span>
+          <select class="form-input" formControlName="parentCategoryId">
+            <option [ngValue]="null">None</option>
+            @for (parent of parents(); track parent.categoryId) {
+              @if (!isEdit() || parent.categoryId !== editId()) {
+                <option [ngValue]="parent.categoryId">
+                  {{ parent.categoryCode }} — {{ parent.categoryName }}
+                </option>
+              }
+            }
+          </select>
+        </label>
+        @if (isEdit()) {
+          <label class="form-check"><input type="checkbox" formControlName="isActive" /><span>Active</span></label>
+        }
+        <div class="form-actions">
+          <button class="btn btn--primary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Saving…' : 'Save' }}
+          </button>
+        </div>
+      </form>
+    }
+  </app-ui-card>
+</section>

@@ -1,0 +1,89 @@
+<section class="page">
+  <app-page-header [title]="(isEdit() ? 'Edit' : 'Add') + ' purchase order'">
+    <a class="btn btn--secondary" routerLink="/inventory/purchase-orders">Back</a>
+  </app-page-header>
+  <app-ui-card title="Details">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else {
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+        <label class="form-field">
+          <span class="form-label">Supplier</span>
+          <select class="form-input" formControlName="supplierId">
+            <option [ngValue]="0" disabled>Select supplier</option>
+            @for (supplier of suppliers(); track supplier.supplierId) {
+              <option [ngValue]="supplier.supplierId">{{ supplier.supplierName }}</option>
+            }
+          </select>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Warehouse</span>
+          <select class="form-input" formControlName="warehouseId">
+            <option [ngValue]="null">None</option>
+            @for (warehouse of warehouses(); track warehouse.warehouseId) {
+              <option [ngValue]="warehouse.warehouseId">{{ warehouse.warehouseName }}</option>
+            }
+          </select>
+        </label>
+        @if (!isEdit()) {
+          <label class="form-field">
+            <span class="form-label">Order number</span>
+            <input class="form-input" formControlName="orderNumber" placeholder="Auto if blank" />
+          </label>
+        }
+        <label class="form-field">
+          <span class="form-label">Order date</span>
+          <input class="form-input" type="date" formControlName="orderDate" />
+        </label>
+        <label class="form-field form-field--full">
+          <span class="form-label">Notes</span>
+          <input class="form-input" formControlName="notes" />
+        </label>
+
+        <div class="form-field form-field--full">
+          <h3 class="section-title">Lines</h3>
+          <div formArrayName="lines" class="stack">
+            @for (line of lines.controls; track $index; let i = $index) {
+              <div class="line-row" [formGroupName]="i">
+                <label class="form-field">
+                  <span class="form-label">Item</span>
+                  <select class="form-input" formControlName="itemId">
+                    <option [ngValue]="0" disabled>Select item</option>
+                    @for (item of items(); track item.itemId) {
+                      <option [ngValue]="item.itemId">{{ item.itemCode }} — {{ item.itemName }}</option>
+                    }
+                  </select>
+                </label>
+                <label class="form-field">
+                  <span class="form-label">Qty ordered</span>
+                  <input class="form-input" type="number" step="0.0001" formControlName="quantityOrdered" />
+                </label>
+                <label class="form-field">
+                  <span class="form-label">Unit cost</span>
+                  <input class="form-input" type="number" step="0.01" formControlName="unitCost" />
+                </label>
+                <label class="form-field">
+                  <span class="form-label">Notes</span>
+                  <input class="form-input" formControlName="notes" />
+                </label>
+                @if (lines.length > 1) {
+                  <button type="button" class="btn btn--secondary" (click)="removeLine(i)">Remove</button>
+                }
+              </div>
+            }
+          </div>
+          <button type="button" class="btn btn--secondary" (click)="addLine()">Add line</button>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn--primary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Saving…' : 'Save' }}
+          </button>
+        </div>
+      </form>
+    }
+  </app-ui-card>
+</section>

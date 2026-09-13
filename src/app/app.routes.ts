@@ -88,6 +88,11 @@ export const routes: Routes = [
         loadChildren: () => import('./features/hrms/hrms.routes').then((m) => m.HRMS_ROUTES)
       },
       {
+        path: 'inventory',
+        loadChildren: () =>
+          import('./features/inventory/inventory.routes').then((m) => m.INVENTORY_ROUTES)
+      },
+      {
         path: 'notifications',
         loadChildren: () =>
           import('./features/notifications/notifications.routes').then((m) => m.NOTIFICATIONS_ROUTES)

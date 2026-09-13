@@ -1,0 +1,101 @@
+<section class="page">
+  <app-page-header title="Stock transactions">
+    <a class="btn btn--secondary" routerLink="/inventory/stock">Back to stock</a>
+  </app-page-header>
+  <app-ui-card title="Ledger">
+    <form class="filters" [formGroup]="filters" (ngSubmit)="load(true)">
+      <label class="form-field">
+        <span class="form-label">Warehouse</span>
+        <select class="form-input" formControlName="warehouseId">
+          <option [ngValue]="null">All</option>
+          @for (warehouse of warehouses(); track warehouse.warehouseId) {
+            <option [ngValue]="warehouse.warehouseId">{{ warehouse.warehouseName }}</option>
+          }
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Item</span>
+        <select class="form-input" formControlName="itemId">
+          <option [ngValue]="null">All</option>
+          @for (item of items(); track item.itemId) {
+            <option [ngValue]="item.itemId">{{ item.itemCode }} — {{ item.itemName }}</option>
+          }
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Type</span>
+        <select class="form-input" formControlName="transactionType">
+          <option value="">All</option>
+          <option [value]="transactionTypes.Opening">Opening</option>
+          <option [value]="transactionTypes.PurchaseReceipt">Purchase receipt</option>
+          <option [value]="transactionTypes.AdjustmentIn">Adjustment in</option>
+          <option [value]="transactionTypes.AdjustmentOut">Adjustment out</option>
+          <option [value]="transactionTypes.TransferOut">Transfer out</option>
+          <option [value]="transactionTypes.TransferIn">Transfer in</option>
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">From date</span>
+        <input class="form-input" type="date" formControlName="fromDate" />
+      </label>
+      <label class="form-field">
+        <span class="form-label">To date</span>
+        <input class="form-input" type="date" formControlName="toDate" />
+      </label>
+      <button class="btn btn--secondary" type="submit">Apply</button>
+    </form>
+
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else if (!rows().length) {
+      <app-empty-state title="No transactions" message="Nothing found.">
+        <button type="button" class="btn btn--secondary" (click)="load(true)">Retry</button>
+      </app-empty-state>
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Warehouse</th>
+              <th>Item</th>
+              <th>Type</th>
+              <th>Qty</th>
+              <th>Unit cost</th>
+              <th>Reference</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.transactionId) {
+              <tr>
+                <td>{{ row.createdDate | date: 'medium' }}</td>
+                <td>{{ row.warehouseId }}</td>
+                <td>{{ row.itemId }}</td>
+                <td>{{ stockTransactionTypeLabel(row.transactionType) }}</td>
+                <td>{{ formatQuantity(row.quantity) }}</td>
+                <td>{{ row.unitCost ?? '—' }}</td>
+                <td>{{ row.referenceType ?? '—' }} {{ row.referenceId ?? '' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn--secondary" [disabled]="skip() <= 0" (click)="prevPage()">
+          Previous
+        </button>
+        <button
+          type="button"
+          class="btn btn--secondary"
+          [disabled]="rows().length < pageSize"
+          (click)="nextPage()"
+        >
+          Next
+        </button>
+      </div>
+    }
+  </app-ui-card>
+</section>

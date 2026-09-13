@@ -1,0 +1,6 @@
+.page { display: flex; flex-direction: column; gap: 1rem; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+.data-table { width: 100%; border-collapse: collapse; min-width: 28rem; }
+.data-table th, .data-table td { padding: 0.75rem 0.9rem; border-bottom: 1px solid var(--color-border); text-align: left; vertical-align: middle; }
+.data-table th { font-size: 0.8125rem; text-transform: uppercase; color: var(--color-text-muted); background: var(--color-surface-muted); }
+.data-table__actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }

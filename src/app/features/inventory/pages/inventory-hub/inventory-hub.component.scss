@@ -1,0 +1,10 @@
+.hub { display: flex; flex-direction: column; gap: 1.25rem; }
+.hub__grid { display: grid; gap: 1rem; }
+.hub__link { text-decoration: none; color: inherit; border-radius: var(--radius-md); }
+.hub__link p { margin: 0; color: var(--color-text-muted); }
+.hub__links { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 0.75rem 1.25rem; }
+.hub__links a { color: var(--color-primary); text-decoration: none; }
+.hub__links a:hover { text-decoration: underline; }
+@media (min-width: 800px) {
+  .hub__grid { grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); }
+}

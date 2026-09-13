@@ -1,0 +1,67 @@
+<section class="page">
+  <app-page-header title="Stock transfer">
+    <a class="btn btn--secondary" routerLink="/inventory/stock">Back</a>
+  </app-page-header>
+  <app-ui-card title="Transfer">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+      <label class="form-field">
+        <span class="form-label">From warehouse</span>
+        <select class="form-input" formControlName="fromWarehouseId">
+          <option [ngValue]="0" disabled>Select warehouse</option>
+          @for (warehouse of warehouses(); track warehouse.warehouseId) {
+            <option [ngValue]="warehouse.warehouseId">{{ warehouse.warehouseName }}</option>
+          }
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">To warehouse</span>
+        <select class="form-input" formControlName="toWarehouseId">
+          <option [ngValue]="0" disabled>Select warehouse</option>
+          @for (warehouse of warehouses(); track warehouse.warehouseId) {
+            <option [ngValue]="warehouse.warehouseId">{{ warehouse.warehouseName }}</option>
+          }
+        </select>
+      </label>
+      <label class="form-field form-field--full">
+        <span class="form-label">Notes</span>
+        <input class="form-input" formControlName="notes" />
+      </label>
+
+      <div class="form-field form-field--full">
+        <h3 class="section-title">Lines</h3>
+        <div formArrayName="lines" class="stack">
+          @for (line of lines.controls; track $index; let i = $index) {
+            <div class="line-row" [formGroupName]="i">
+              <label class="form-field">
+                <span class="form-label">Item</span>
+                <select class="form-input" formControlName="itemId">
+                  <option [ngValue]="0" disabled>Select item</option>
+                  @for (item of items(); track item.itemId) {
+                    <option [ngValue]="item.itemId">{{ item.itemCode }} — {{ item.itemName }}</option>
+                  }
+                </select>
+              </label>
+              <label class="form-field">
+                <span class="form-label">Quantity</span>
+                <input class="form-input" type="number" step="0.0001" formControlName="quantity" />
+              </label>
+              @if (lines.length > 1) {
+                <button type="button" class="btn btn--secondary" (click)="removeLine(i)">Remove</button>
+              }
+            </div>
+          }
+        </div>
+        <button type="button" class="btn btn--secondary" (click)="addLine()">Add line</button>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn--primary" type="submit" [disabled]="saving()">
+          {{ saving() ? 'Submitting…' : 'Submit transfer' }}
+        </button>
+      </div>
+    </form>
+  </app-ui-card>
+</section>

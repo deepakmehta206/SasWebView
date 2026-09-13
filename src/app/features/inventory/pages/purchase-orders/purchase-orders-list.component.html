@@ -1,0 +1,84 @@
+<section class="page">
+  <app-page-header title="Purchase orders">
+    <ng-container *appHasPermission="permissionCodes.InventoryPurchaseManage">
+      <a class="btn btn--primary" routerLink="new">Add</a>
+    </ng-container>
+    <ng-container *appHasPermission="permissionCodes.InventoryReceiptCreate">
+      <a class="btn btn--secondary" routerLink="/inventory/goods-receipts/new">Goods receipt</a>
+    </ng-container>
+  </app-page-header>
+  <app-ui-card title="Purchase orders">
+    <form class="filters" [formGroup]="filters" (ngSubmit)="load()">
+      <label class="form-field">
+        <span class="form-label">Supplier</span>
+        <select class="form-input" formControlName="supplierId">
+          <option [ngValue]="null">All</option>
+          @for (supplier of suppliers(); track supplier.supplierId) {
+            <option [ngValue]="supplier.supplierId">{{ supplier.supplierName }}</option>
+          }
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Status</span>
+        <select class="form-input" formControlName="status">
+          <option value="">All</option>
+          <option [value]="statuses.Draft">Draft</option>
+          <option [value]="statuses.Approved">Approved</option>
+          <option [value]="statuses.Cancelled">Cancelled</option>
+          <option [value]="statuses.Closed">Closed</option>
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">From date</span>
+        <input class="form-input" type="date" formControlName="fromDate" />
+      </label>
+      <label class="form-field">
+        <span class="form-label">To date</span>
+        <input class="form-input" type="date" formControlName="toDate" />
+      </label>
+      <button class="btn btn--secondary" type="submit">Apply</button>
+    </form>
+
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else if (!rows().length) {
+      <app-empty-state title="No purchase orders" message="Nothing found.">
+        <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+      </app-empty-state>
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Order #</th>
+              <th>Date</th>
+              <th>Supplier</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.purchaseOrderId) {
+              <tr>
+                <td>{{ row.orderNumber }}</td>
+                <td>{{ row.orderDate | date: 'mediumDate' }}</td>
+                <td>{{ supplierName(row.supplierId) }}</td>
+                <td>
+                  <span class="status-pill" [class]="purchaseOrderStatusModifier(row.status)">
+                    {{ purchaseOrderStatusLabel(row.status) }}
+                  </span>
+                </td>
+                <td class="data-table__actions">
+                  <a class="btn btn--secondary" [routerLink]="[row.purchaseOrderId]">View</a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+</section>

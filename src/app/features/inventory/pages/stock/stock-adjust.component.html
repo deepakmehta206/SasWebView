@@ -1,0 +1,50 @@
+<section class="page">
+  <app-page-header title="Stock adjustment">
+    <a class="btn btn--secondary" routerLink="/inventory/stock">Back</a>
+  </app-page-header>
+  <app-ui-card title="Adjustment">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+      <label class="form-field">
+        <span class="form-label">Warehouse</span>
+        <select class="form-input" formControlName="warehouseId">
+          <option [ngValue]="0" disabled>Select warehouse</option>
+          @for (warehouse of warehouses(); track warehouse.warehouseId) {
+            <option [ngValue]="warehouse.warehouseId">{{ warehouse.warehouseName }}</option>
+          }
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Item</span>
+        <select class="form-input" formControlName="itemId">
+          <option [ngValue]="0" disabled>Select item</option>
+          @for (item of items(); track item.itemId) {
+            <option [ngValue]="item.itemId">{{ item.itemCode }} — {{ item.itemName }}</option>
+          }
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Direction</span>
+        <select class="form-input" formControlName="direction">
+          <option [value]="directions.In">In</option>
+          <option [value]="directions.Out">Out</option>
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Quantity</span>
+        <input class="form-input" type="number" step="0.0001" formControlName="quantity" />
+      </label>
+      <label class="form-field form-field--full">
+        <span class="form-label">Reason</span>
+        <input class="form-input" formControlName="reason" />
+      </label>
+      <div class="form-actions">
+        <button class="btn btn--primary" type="submit" [disabled]="saving()">
+          {{ saving() ? 'Submitting…' : 'Submit adjustment' }}
+        </button>
+      </div>
+    </form>
+  </app-ui-card>
+</section>

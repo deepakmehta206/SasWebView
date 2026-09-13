@@ -1,0 +1,86 @@
+<section class="page">
+  <app-page-header title="Goods receipt">
+    <a class="btn btn--secondary" routerLink="/inventory/purchase-orders">Back</a>
+  </app-page-header>
+  <app-ui-card title="Receipt">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else {
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+        <label class="form-field">
+          <span class="form-label">Approved purchase order</span>
+          <select
+            class="form-input"
+            formControlName="purchaseOrderId"
+            (change)="onPurchaseOrderChange(+$any($event.target).value)"
+          >
+            <option [ngValue]="0" disabled>Select purchase order</option>
+            @for (order of approvedOrders(); track order.purchaseOrderId) {
+              <option [ngValue]="order.purchaseOrderId">
+                {{ order.orderNumber }} — {{ order.orderDate | date: 'mediumDate' }}
+              </option>
+            }
+          </select>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Warehouse</span>
+          <select class="form-input" formControlName="warehouseId">
+            <option [ngValue]="0" disabled>Select warehouse</option>
+            @for (warehouse of warehouses(); track warehouse.warehouseId) {
+              <option [ngValue]="warehouse.warehouseId">{{ warehouse.warehouseName }}</option>
+            }
+          </select>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Receipt date</span>
+          <input class="form-input" type="date" formControlName="receiptDate" />
+        </label>
+        <label class="form-field form-field--full">
+          <span class="form-label">Notes</span>
+          <input class="form-input" formControlName="notes" />
+        </label>
+
+        @if (selectedOrder()) {
+          <div class="form-field form-field--full">
+            <h3 class="section-title">Lines</h3>
+            @if (!lines.length) {
+              <p class="muted">No remaining quantities to receive on this order.</p>
+            } @else {
+              <div formArrayName="lines" class="stack">
+                @for (line of lines.controls; track $index; let i = $index) {
+                  <div class="line-row" [formGroupName]="i">
+                    <div class="line-meta">
+                      <strong>{{ itemLabel(line.value.itemId) }}</strong>
+                      <span class="muted">
+                        Ordered {{ formatQuantity(line.value.quantityOrdered) }} ·
+                        Received {{ formatQuantity(line.value.receivedQuantity) }} ·
+                        Remaining {{ formatQuantity(line.value.remaining) }}
+                      </span>
+                    </div>
+                    <label class="form-field">
+                      <span class="form-label">Qty received</span>
+                      <input class="form-input" type="number" step="0.0001" formControlName="quantityReceived" />
+                    </label>
+                    <label class="form-field">
+                      <span class="form-label">Unit cost</span>
+                      <input class="form-input" type="number" step="0.01" formControlName="unitCost" />
+                    </label>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <div class="form-actions">
+          <button class="btn btn--primary" type="submit" [disabled]="saving() || !lines.length">
+            {{ saving() ? 'Submitting…' : 'Submit receipt' }}
+          </button>
+        </div>
+      </form>
+    }
+  </app-ui-card>
+</section>

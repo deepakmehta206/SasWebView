@@ -1,0 +1,66 @@
+<section class="page">
+  <app-page-header title="Stock on hand">
+    <ng-container *appHasPermission="permissionCodes.InventoryStockAdjust">
+      <a class="btn btn--secondary" routerLink="/inventory/stock/adjust">Adjust</a>
+    </ng-container>
+    <ng-container *appHasPermission="permissionCodes.InventoryStockTransfer">
+      <a class="btn btn--secondary" routerLink="/inventory/stock/transfer">Transfer</a>
+    </ng-container>
+    <a class="btn btn--secondary" routerLink="/inventory/stock-transactions">Transactions</a>
+  </app-page-header>
+  <app-ui-card title="Stock">
+    <form class="filters" [formGroup]="filters" (ngSubmit)="load()">
+      <label class="form-field">
+        <span class="form-label">Warehouse</span>
+        <select class="form-input" formControlName="warehouseId">
+          <option [ngValue]="null">All</option>
+          @for (warehouse of warehouses(); track warehouse.warehouseId) {
+            <option [ngValue]="warehouse.warehouseId">{{ warehouse.warehouseName }}</option>
+          }
+        </select>
+      </label>
+      <label class="form-check">
+        <input type="checkbox" formControlName="lowStockOnly" /><span>Low stock only</span>
+      </label>
+      <button class="btn btn--secondary" type="submit">Apply</button>
+    </form>
+
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else if (!rows().length) {
+      <app-empty-state title="No stock" message="Nothing found.">
+        <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+      </app-empty-state>
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Warehouse</th>
+              <th>Item</th>
+              <th>On hand</th>
+              <th>Reserved</th>
+              <th>Available</th>
+              <th>Avg cost</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.warehouseStockId) {
+              <tr [class.row--warning]="row.quantityOnHand <= row.reorderLevel">
+                <td>{{ row.warehouseName }}</td>
+                <td>{{ row.itemCode }} — {{ row.itemName }}</td>
+                <td>{{ formatQuantity(row.quantityOnHand) }}</td>
+                <td>{{ formatQuantity(row.reservedQuantity) }}</td>
+                <td>{{ formatQuantity(row.availableQuantity) }}</td>
+                <td>{{ row.averageCost }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+</section>

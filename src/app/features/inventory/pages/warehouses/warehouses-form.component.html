@@ -1,0 +1,53 @@
+<section class="page">
+  <app-page-header [title]="(isEdit() ? 'Edit' : 'Add') + ' warehouse'">
+    <a class="btn btn--secondary" routerLink="/inventory/warehouses">Back</a>
+  </app-page-header>
+  <app-ui-card title="Details">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else {
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+        <label class="form-field">
+          <span class="form-label">Branch</span>
+          <select class="form-input" formControlName="branchId">
+            <option [ngValue]="0" disabled>Select branch</option>
+            @for (branch of branches(); track branch.branchId) {
+              <option [ngValue]="branch.branchId">{{ branch.branchCode }} — {{ branch.branchName }}</option>
+            }
+          </select>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Code</span>
+          <input class="form-input" formControlName="warehouseCode" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Name</span>
+          <input class="form-input" formControlName="warehouseName" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Type</span>
+          <select class="form-input" formControlName="warehouseType">
+            <option [value]="warehouseTypes.Main">Main</option>
+            <option [value]="warehouseTypes.Store">Store</option>
+            <option [value]="warehouseTypes.Transit">Transit</option>
+          </select>
+        </label>
+        <label class="form-field form-field--full">
+          <span class="form-label">Address</span>
+          <input class="form-input" formControlName="address" />
+        </label>
+        @if (isEdit()) {
+          <label class="form-check"><input type="checkbox" formControlName="isActive" /><span>Active</span></label>
+        }
+        <div class="form-actions">
+          <button class="btn btn--primary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Saving…' : 'Save' }}
+          </button>
+        </div>
+      </form>
+    }
+  </app-ui-card>
+</section>

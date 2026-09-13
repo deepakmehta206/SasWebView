@@ -1,0 +1,6 @@
+.page { display: flex; flex-direction: column; gap: 1rem; }
+.form-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.5rem; }
+.section-title { margin: 0 0 0.5rem; font-size: 1rem; }
+.stack { display: flex; flex-direction: column; gap: 1rem; }
+.line-row { display: grid; gap: 0.75rem; align-items: end; }
+@media (min-width: 700px) { .line-row { grid-template-columns: 1fr 10rem auto; } }

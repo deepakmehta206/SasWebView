@@ -224,8 +224,35 @@ export const SIDEBAR_NAV_ITEMS: readonly NavItem[] = [
     label: 'Inventory',
     route: '/inventory',
     icon: 'inventory',
-    enabled: false,
-    moduleCode: 'INVENTORY'
+    enabled: true,
+    moduleCode: ModuleCodes.Inventory,
+    anyPermissions: [PermissionCodes.InventoryView],
+    children: [
+      {
+        label: 'Items',
+        route: '/inventory/items',
+        enabled: true,
+        moduleCode: ModuleCodes.Inventory,
+        featureCode: FeatureCodes.InventoryItem,
+        anyPermissions: [PermissionCodes.InventoryView]
+      },
+      {
+        label: 'Stock',
+        route: '/inventory/stock',
+        enabled: true,
+        moduleCode: ModuleCodes.Inventory,
+        featureCode: FeatureCodes.InventoryStock,
+        anyPermissions: [PermissionCodes.InventoryView]
+      },
+      {
+        label: 'Purchases',
+        route: '/inventory/purchase-orders',
+        enabled: true,
+        moduleCode: ModuleCodes.Inventory,
+        featureCode: FeatureCodes.InventoryPurchase,
+        anyPermissions: [PermissionCodes.InventoryView]
+      }
+    ]
   },
   {
     label: 'Billing',

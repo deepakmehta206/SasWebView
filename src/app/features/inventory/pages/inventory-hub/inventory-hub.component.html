@@ -1,0 +1,21 @@
+<section class="hub">
+  <app-page-header title="Inventory" subtitle="Items, stock, and purchasing for the tenant." />
+
+  <div class="hub__grid">
+    @for (link of mainLinks; track link.route) {
+      <a class="hub__link" [routerLink]="link.route">
+        <app-ui-card [title]="link.title"><p>{{ link.description }}</p></app-ui-card>
+      </a>
+    }
+  </div>
+
+  <app-ui-card title="Quick links">
+    <ul class="hub__links">
+      @for (link of secondaryLinks; track link.route) {
+        <li *appHasPermission="link.permission">
+          <a [routerLink]="link.route">{{ link.title }}</a>
+        </li>
+      }
+    </ul>
+  </app-ui-card>
+</section>

@@ -1,0 +1,32 @@
+<section class="page">
+  <app-page-header [title]="(isEdit() ? 'Edit' : 'Add') + ' brand'">
+    <a class="btn btn--secondary" routerLink="/inventory/brands">Back</a>
+  </app-page-header>
+  <app-ui-card title="Details">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else {
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+        <label class="form-field">
+          <span class="form-label">Code</span>
+          <input class="form-input" formControlName="brandCode" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Name</span>
+          <input class="form-input" formControlName="brandName" />
+        </label>
+        @if (isEdit()) {
+          <label class="form-check"><input type="checkbox" formControlName="isActive" /><span>Active</span></label>
+        }
+        <div class="form-actions">
+          <button class="btn btn--primary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Saving…' : 'Save' }}
+          </button>
+        </div>
+      </form>
+    }
+  </app-ui-card>
+</section>

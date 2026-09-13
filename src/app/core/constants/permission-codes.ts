@@ -71,7 +71,17 @@ export const PermissionCodes = {
   FileUpload: 'FILE_UPLOAD',
   FileDelete: 'FILE_DELETE',
 
-  AuditView: 'AUDIT_VIEW'
+  AuditView: 'AUDIT_VIEW',
+
+  InventoryView: 'INVENTORY_VIEW',
+  InventoryItemManage: 'INVENTORY_ITEM_MANAGE',
+  InventorySupplierManage: 'INVENTORY_SUPPLIER_MANAGE',
+  InventoryWarehouseManage: 'INVENTORY_WAREHOUSE_MANAGE',
+  InventoryStockAdjust: 'INVENTORY_STOCK_ADJUST',
+  InventoryStockTransfer: 'INVENTORY_STOCK_TRANSFER',
+  InventoryPurchaseManage: 'INVENTORY_PURCHASE_MANAGE',
+  InventoryPurchaseApprove: 'INVENTORY_PURCHASE_APPROVE',
+  InventoryReceiptCreate: 'INVENTORY_RECEIPT_CREATE'
 } as const;
 
 export type PermissionCode = (typeof PermissionCodes)[keyof typeof PermissionCodes];

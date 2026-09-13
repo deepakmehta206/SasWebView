@@ -1,0 +1,103 @@
+<section class="page">
+  <app-page-header title="Purchase order">
+    <a class="btn btn--secondary" routerLink="/inventory/purchase-orders">Back</a>
+  </app-page-header>
+
+  @if (errorMessage()) {
+    <div class="alert alert--danger">{{ errorMessage() }}</div>
+  }
+
+  @if (loading()) {
+    <app-loading-indicator label="Loading…" />
+  } @else {
+    @if (order(); as item) {
+      <app-ui-card title="Summary">
+        <dl class="detail-list">
+          <div><dt>Order #</dt><dd>{{ item.orderNumber }}</dd></div>
+          <div><dt>Date</dt><dd>{{ item.orderDate | date: 'mediumDate' }}</dd></div>
+          <div><dt>Supplier</dt><dd>{{ supplierName(item.supplierId) }}</dd></div>
+          <div><dt>Warehouse</dt><dd>{{ warehouseName(item.warehouseId) }}</dd></div>
+          <div>
+            <dt>Status</dt>
+            <dd>
+              <span class="status-pill" [class]="purchaseOrderStatusModifier(item.status)">
+                {{ purchaseOrderStatusLabel(item.status) }}
+              </span>
+            </dd>
+          </div>
+          <div><dt>Notes</dt><dd>{{ item.notes ?? '—' }}</dd></div>
+        </dl>
+        <div class="form-actions">
+          @if (actions().canEdit) {
+            <ng-container *appHasPermission="permissionCodes.InventoryPurchaseManage">
+              <a class="btn btn--secondary" [routerLink]="['/inventory/purchase-orders', item.purchaseOrderId, 'edit']">
+                Edit
+              </a>
+            </ng-container>
+          }
+          @if (actions().canApprove) {
+            <ng-container *appHasPermission="permissionCodes.InventoryPurchaseApprove">
+              <button type="button" class="btn btn--primary" [disabled]="acting()" (click)="approve()">
+                Approve
+              </button>
+            </ng-container>
+          }
+          @if (actions().canCancel) {
+            <ng-container *appHasPermission="permissionCodes.InventoryPurchaseManage">
+              <button type="button" class="btn btn--secondary" [disabled]="acting()" (click)="cancel()">
+                Cancel
+              </button>
+            </ng-container>
+          }
+          @if (actions().canClose) {
+            <ng-container *appHasPermission="permissionCodes.InventoryPurchaseManage">
+              <button type="button" class="btn btn--secondary" [disabled]="acting()" (click)="close()">
+                Close
+              </button>
+            </ng-container>
+          }
+          @if (actions().canReceive) {
+            <ng-container *appHasPermission="permissionCodes.InventoryReceiptCreate">
+              <button type="button" class="btn btn--secondary" [disabled]="acting()" (click)="receive()">
+                Receive goods
+              </button>
+            </ng-container>
+          }
+        </div>
+      </app-ui-card>
+
+      <app-ui-card title="Lines">
+        @if (!item.details.length) {
+          <app-empty-state title="No lines" message="No order lines yet." />
+        } @else {
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Ordered</th>
+                  <th>Received</th>
+                  <th>Remaining</th>
+                  <th>Unit cost</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (detail of item.details; track detail.purchaseOrderDetailId) {
+                  <tr>
+                    <td>{{ itemLabel(detail.itemId) }}</td>
+                    <td>{{ formatQuantity(detail.quantityOrdered) }}</td>
+                    <td>{{ formatQuantity(detail.receivedQuantity) }}</td>
+                    <td>{{ formatQuantity(remainingQuantity(detail.quantityOrdered, detail.receivedQuantity)) }}</td>
+                    <td>{{ formatMoney(detail.unitCost) }}</td>
+                    <td>{{ detail.notes ?? '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </app-ui-card>
+    }
+  }
+</section>
