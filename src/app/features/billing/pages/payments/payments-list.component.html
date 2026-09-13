@@ -1,0 +1,69 @@
+<section class="page">
+  <app-page-header title="Payments" />
+
+  <app-ui-card title="Payments">
+    <form class="filters" [formGroup]="filters" (ngSubmit)="load()">
+      <label class="form-field">
+        <span class="form-label">Invoice ID</span>
+        <input class="form-input" type="number" formControlName="invoiceId" placeholder="Optional" />
+      </label>
+      <label class="form-field">
+        <span class="form-label">From date</span>
+        <input class="form-input" type="date" formControlName="fromDate" />
+      </label>
+      <label class="form-field">
+        <span class="form-label">To date</span>
+        <input class="form-input" type="date" formControlName="toDate" />
+      </label>
+      <button class="btn btn--secondary" type="submit">Apply</button>
+    </form>
+
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else if (!rows().length) {
+      <app-empty-state title="No payments" message="Nothing found.">
+        <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+      </app-empty-state>
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Invoice</th>
+              <th>Amount</th>
+              <th>Mode</th>
+              <th>Reference</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.paymentId) {
+              <tr>
+                <td>{{ row.paymentDate | date: 'mediumDate' }}</td>
+                <td>
+                  <a [routerLink]="['/billing/invoices', row.invoiceId]">{{ row.invoiceId }}</a>
+                </td>
+                <td>{{ formatMoney(row.amount) }}</td>
+                <td>{{ paymentModeName(row.paymentModeId) }}</td>
+                <td>{{ row.referenceNumber ?? '—' }}</td>
+                <td>
+                  <span class="status-pill" [class]="paymentStatusClass(row.status)">
+                    {{ paymentStatusLabel(row.status) }}
+                  </span>
+                </td>
+                <td class="data-table__actions">
+                  <a class="btn btn--secondary" [routerLink]="['/billing/invoices', row.invoiceId]">View invoice</a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+</section>

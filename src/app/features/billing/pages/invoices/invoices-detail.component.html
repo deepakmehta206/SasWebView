@@ -1,0 +1,185 @@
+<section class="page">
+  <app-page-header title="Invoice">
+    <a class="btn btn--secondary" routerLink="/billing/invoices">Back</a>
+  </app-page-header>
+
+  @if (errorMessage()) {
+    <div class="alert alert--danger">{{ errorMessage() }}</div>
+  }
+
+  @if (loading()) {
+    <app-loading-indicator label="Loading…" />
+  } @else {
+    @if (invoice(); as item) {
+      <app-ui-card title="Summary">
+        <dl class="detail-list">
+          <div><dt>Invoice #</dt><dd>{{ draftInvoiceNumberLabel(item.invoiceNumber) }}</dd></div>
+          <div><dt>Date</dt><dd>{{ item.invoiceDate | date: 'mediumDate' }}</dd></div>
+          <div><dt>Due date</dt><dd>{{ item.dueDate ? (item.dueDate | date: 'mediumDate') : '—' }}</dd></div>
+          <div><dt>Customer</dt><dd>{{ customerName(item.customerId) }}</dd></div>
+          <div><dt>Branch</dt><dd>{{ branchName(item.branchId) }}</dd></div>
+          <div>
+            <dt>Status</dt>
+            <dd>
+              <span class="status-pill" [class]="invoiceStatusClass(item.status)">
+                {{ invoiceStatusLabel(item.status) }}
+              </span>
+            </dd>
+          </div>
+          <div><dt>Currency</dt><dd>{{ item.currencyCode }}</dd></div>
+          <div><dt>Subtotal</dt><dd>{{ formatMoney(item.subtotal, item.currencyCode) }}</dd></div>
+          <div><dt>Discount</dt><dd>{{ formatMoney(item.discountAmount, item.currencyCode) }}</dd></div>
+          <div><dt>Tax</dt><dd>{{ formatMoney(item.taxAmount, item.currencyCode) }}</dd></div>
+          <div><dt>Total</dt><dd>{{ formatMoney(item.totalAmount, item.currencyCode) }}</dd></div>
+          <div><dt>Paid</dt><dd>{{ formatMoney(item.paidAmount, item.currencyCode) }}</dd></div>
+          <div><dt>Outstanding</dt><dd>{{ formatMoney(item.outstandingAmount, item.currencyCode) }}</dd></div>
+          <div><dt>Notes</dt><dd>{{ item.notes ?? '—' }}</dd></div>
+        </dl>
+
+        <div class="form-actions">
+          @if (actions().canEdit) {
+            <ng-container *appHasPermission="permissionCodes.BillingInvoiceManage">
+              <button type="button" class="btn btn--secondary" [disabled]="acting()" (click)="edit()">Edit</button>
+            </ng-container>
+          }
+          @if (actions().canApprove) {
+            <ng-container *appHasPermission="permissionCodes.BillingInvoiceApprove">
+              <button type="button" class="btn btn--primary" [disabled]="acting()" (click)="approve()">Approve</button>
+            </ng-container>
+          }
+          @if (actions().canCancel) {
+            <ng-container *appHasPermission="permissionCodes.BillingInvoiceCancel">
+              <button type="button" class="btn btn--secondary" [disabled]="acting()" (click)="cancel()">Cancel</button>
+            </ng-container>
+          }
+        </div>
+      </app-ui-card>
+
+      <app-ui-card title="Lines">
+        @if (!item.lines.length) {
+          <app-empty-state title="No lines" message="No invoice lines yet." />
+        } @else {
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Item</th>
+                  <th>Description</th>
+                  <th>UOM</th>
+                  <th>Qty</th>
+                  <th>Unit price</th>
+                  <th>Disc %</th>
+                  <th>Tax %</th>
+                  <th>Line total</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (line of item.lines; track line.invoiceLineId) {
+                  <tr>
+                    <td>{{ line.lineNumber }}</td>
+                    <td>{{ line.itemCode ? line.itemCode + ' — ' + line.itemName : '—' }}</td>
+                    <td>{{ line.description }}</td>
+                    <td>{{ line.uomCode ?? '—' }}</td>
+                    <td>{{ line.quantity }}</td>
+                    <td>{{ formatMoney(line.unitPrice, item.currencyCode) }}</td>
+                    <td>{{ line.discountPercent }}</td>
+                    <td>{{ line.taxPercent }}</td>
+                    <td>{{ formatMoney(line.lineTotal, item.currencyCode) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </app-ui-card>
+
+      <app-ui-card title="Payments">
+        @if (actions().canPay) {
+          <ng-container *appHasPermission="permissionCodes.BillingPaymentManage">
+            <form class="form-grid payment-form" [formGroup]="paymentForm" (ngSubmit)="postPayment()">
+              <label class="form-field">
+                <span class="form-label">Payment date</span>
+                <input class="form-input" type="date" formControlName="paymentDate" />
+              </label>
+              <label class="form-field">
+                <span class="form-label">Amount</span>
+                <input class="form-input" type="number" step="0.01" formControlName="amount" />
+              </label>
+              <label class="form-field">
+                <span class="form-label">Payment mode</span>
+                <select class="form-input" formControlName="paymentModeId">
+                  <option [ngValue]="0" disabled>Select mode</option>
+                  @for (mode of paymentModes(); track mode.paymentModeId) {
+                    <option [ngValue]="mode.paymentModeId">{{ mode.paymentModeName }}</option>
+                  }
+                </select>
+              </label>
+              <label class="form-field">
+                <span class="form-label">Reference</span>
+                <input class="form-input" formControlName="referenceNumber" />
+              </label>
+              <label class="form-field form-field--full">
+                <span class="form-label">Notes</span>
+                <input class="form-input" formControlName="notes" />
+              </label>
+              <div class="form-actions">
+                <button class="btn btn--primary" type="submit" [disabled]="postingPayment()">
+                  {{ postingPayment() ? 'Posting…' : 'Post payment' }}
+                </button>
+              </div>
+            </form>
+          </ng-container>
+        }
+
+        @if (!payments().length) {
+          <app-empty-state title="No payments" message="No payments recorded yet." />
+        } @else {
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>Mode</th>
+                  <th>Reference</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (payment of payments(); track payment.paymentId) {
+                  <tr>
+                    <td>{{ payment.paymentDate | date: 'mediumDate' }}</td>
+                    <td>{{ formatMoney(payment.amount, item.currencyCode) }}</td>
+                    <td>{{ paymentModeName(payment.paymentModeId) }}</td>
+                    <td>{{ payment.referenceNumber ?? '—' }}</td>
+                    <td>
+                      <span class="status-pill" [class]="paymentStatusClass(payment.status)">
+                        {{ paymentStatusLabel(payment.status) }}
+                      </span>
+                    </td>
+                    <td class="data-table__actions">
+                      @if (payment.status === paymentStatuses.Posted) {
+                        <ng-container *appHasPermission="permissionCodes.BillingPaymentManage">
+                          <button
+                            type="button"
+                            class="btn btn--secondary"
+                            [disabled]="paymentBusyId() === payment.paymentId"
+                            (click)="cancelPayment(payment)"
+                          >
+                            Cancel
+                          </button>
+                        </ng-container>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </app-ui-card>
+    }
+  }
+</section>

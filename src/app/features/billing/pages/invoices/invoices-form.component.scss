@@ -1,0 +1,14 @@
+.page { display: flex; flex-direction: column; gap: 1rem; }
+.section-title { margin: 0 0 0.75rem; font-size: 1rem; }
+.stack { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 0.75rem; }
+.line-row { display: grid; gap: 0.75rem; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+.line-preview { font-size: 0.875rem; color: var(--color-text-muted); align-self: end; }
+.totals-preview { margin-top: 0.5rem; }
+.totals-list { display: grid; gap: 0.35rem; margin: 0; }
+.totals-list div { display: flex; justify-content: space-between; gap: 1rem; }
+.totals-list dt { margin: 0; font-weight: 500; }
+.totals-list dd { margin: 0; }
+
+@media (min-width: 900px) {
+  .line-row { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; }
+}

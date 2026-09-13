@@ -1,0 +1,82 @@
+<section class="page">
+  <app-page-header [title]="(isEdit() ? 'Edit' : 'Add') + ' customer'">
+    <a class="btn btn--secondary" routerLink="/billing/customers">Back</a>
+  </app-page-header>
+
+  <app-ui-card title="Details">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else {
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+        <label class="form-field">
+          <span class="form-label">Branch</span>
+          <select class="form-input" formControlName="branchId">
+            <option [ngValue]="null">None</option>
+            @for (branch of branches(); track branch.branchId) {
+              <option [ngValue]="branch.branchId">{{ branch.branchName }}</option>
+            }
+          </select>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Code</span>
+          <input class="form-input" formControlName="customerCode" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Name</span>
+          <input class="form-input" formControlName="customerName" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Type</span>
+          <select class="form-input" formControlName="customerType">
+            <option [value]="customerTypes.Individual">Individual</option>
+            <option [value]="customerTypes.Business">Business</option>
+          </select>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Email</span>
+          <input class="form-input" type="email" formControlName="email" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Phone</span>
+          <input class="form-input" formControlName="phone" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Tax number</span>
+          <input class="form-input" formControlName="taxNumber" />
+        </label>
+        <label class="form-field form-field--full">
+          <span class="form-label">Billing address</span>
+          <input class="form-input" formControlName="billingAddress" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Payment terms</span>
+          <input class="form-input" formControlName="paymentTerms" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Credit limit</span>
+          <input class="form-input" type="number" step="0.01" formControlName="creditLimit" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Currency</span>
+          <select class="form-input" formControlName="currencyCode">
+            <option value="">None</option>
+            @for (currency of currencies(); track currency.currencyCode) {
+              <option [value]="currency.currencyCode">{{ currency.currencyCode }} — {{ currency.currencyName }}</option>
+            }
+          </select>
+        </label>
+        @if (isEdit()) {
+          <label class="form-check"><input type="checkbox" formControlName="isActive" /><span>Active</span></label>
+        }
+        <div class="form-actions">
+          <button class="btn btn--primary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Saving…' : 'Save' }}
+          </button>
+        </div>
+      </form>
+    }
+  </app-ui-card>
+</section>

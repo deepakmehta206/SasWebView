@@ -258,8 +258,35 @@ export const SIDEBAR_NAV_ITEMS: readonly NavItem[] = [
     label: 'Billing',
     route: '/billing',
     icon: 'billing',
-    enabled: false,
-    moduleCode: 'BILLING'
+    enabled: true,
+    moduleCode: ModuleCodes.Billing,
+    anyPermissions: [PermissionCodes.BillingView],
+    children: [
+      {
+        label: 'Customers',
+        route: '/billing/customers',
+        enabled: true,
+        moduleCode: ModuleCodes.Billing,
+        featureCode: FeatureCodes.BillingInvoice,
+        anyPermissions: [PermissionCodes.BillingView]
+      },
+      {
+        label: 'Invoices',
+        route: '/billing/invoices',
+        enabled: true,
+        moduleCode: ModuleCodes.Billing,
+        featureCode: FeatureCodes.BillingInvoice,
+        anyPermissions: [PermissionCodes.BillingView]
+      },
+      {
+        label: 'Payments',
+        route: '/billing/payments',
+        enabled: true,
+        moduleCode: ModuleCodes.Billing,
+        featureCode: FeatureCodes.BillingPayment,
+        anyPermissions: [PermissionCodes.BillingView]
+      }
+    ]
   },
   {
     label: 'Hospital',

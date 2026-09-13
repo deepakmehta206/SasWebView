@@ -1,0 +1,118 @@
+<section class="page">
+  <app-page-header [title]="(isEdit() ? 'Edit' : 'Add') + ' invoice'">
+    <a class="btn btn--secondary" routerLink="/billing/invoices">Back</a>
+  </app-page-header>
+
+  <app-ui-card title="Details">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else {
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+        <label class="form-field">
+          <span class="form-label">Branch</span>
+          <select class="form-input" formControlName="branchId">
+            <option [ngValue]="0" disabled>Select branch</option>
+            @for (branch of branches(); track branch.branchId) {
+              <option [ngValue]="branch.branchId">{{ branch.branchName }}</option>
+            }
+          </select>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Customer</span>
+          <select class="form-input" formControlName="customerId">
+            <option [ngValue]="0" disabled>Select customer</option>
+            @for (customer of customers(); track customer.customerId) {
+              <option [ngValue]="customer.customerId">{{ customer.customerName }}</option>
+            }
+          </select>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Invoice date</span>
+          <input class="form-input" type="date" formControlName="invoiceDate" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Due date</span>
+          <input class="form-input" type="date" formControlName="dueDate" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Currency</span>
+          <select class="form-input" formControlName="currencyCode">
+            <option value="" disabled>Select currency</option>
+            @for (currency of currencies(); track currency.currencyCode) {
+              <option [value]="currency.currencyCode">{{ currency.currencyCode }} — {{ currency.currencyName }}</option>
+            }
+          </select>
+        </label>
+        <label class="form-field form-field--full">
+          <span class="form-label">Notes</span>
+          <input class="form-input" formControlName="notes" />
+        </label>
+
+        <div class="form-field form-field--full">
+          <h3 class="section-title">Lines</h3>
+          <div formArrayName="lines" class="stack">
+            @for (line of lines.controls; track $index; let i = $index) {
+              <div class="line-row" [formGroupName]="i">
+                <label class="form-field">
+                  <span class="form-label">Item</span>
+                  <select class="form-input" formControlName="itemId" (change)="onItemSelected(i)">
+                    <option [ngValue]="null">None</option>
+                    @for (item of items(); track item.itemId) {
+                      <option [ngValue]="item.itemId">{{ item.itemCode }} — {{ item.itemName }}</option>
+                    }
+                  </select>
+                </label>
+                <label class="form-field">
+                  <span class="form-label">Description</span>
+                  <input class="form-input" formControlName="description" />
+                </label>
+                <label class="form-field">
+                  <span class="form-label">Quantity</span>
+                  <input class="form-input" type="number" step="0.0001" formControlName="quantity" />
+                </label>
+                <label class="form-field">
+                  <span class="form-label">Unit price</span>
+                  <input class="form-input" type="number" step="0.01" formControlName="unitPrice" />
+                </label>
+                <label class="form-field">
+                  <span class="form-label">Discount %</span>
+                  <input class="form-input" type="number" step="0.01" formControlName="discountPercent" />
+                </label>
+                <label class="form-field">
+                  <span class="form-label">Tax %</span>
+                  <input class="form-input" type="number" step="0.01" formControlName="taxPercent" />
+                </label>
+                <div class="line-preview">
+                  <span>Line total: {{ formatMoney(linePreview(i).lineTotal, form.controls.currencyCode.value) }}</span>
+                </div>
+                @if (lines.length > 1) {
+                  <button type="button" class="btn btn--secondary" (click)="removeLine(i)">Remove</button>
+                }
+              </div>
+            }
+          </div>
+          <button type="button" class="btn btn--secondary" (click)="addLine()">Add line</button>
+        </div>
+
+        <div class="totals-preview form-field--full">
+          <h3 class="section-title">Preview totals</h3>
+          <dl class="totals-list">
+            <div><dt>Subtotal</dt><dd>{{ formatMoney(invoicePreview().subtotal, form.controls.currencyCode.value) }}</dd></div>
+            <div><dt>Discount</dt><dd>{{ formatMoney(invoicePreview().discountAmount, form.controls.currencyCode.value) }}</dd></div>
+            <div><dt>Tax</dt><dd>{{ formatMoney(invoicePreview().taxAmount, form.controls.currencyCode.value) }}</dd></div>
+            <div><dt>Total</dt><dd>{{ formatMoney(invoicePreview().totalAmount, form.controls.currencyCode.value) }}</dd></div>
+          </dl>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn--primary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Saving…' : 'Save' }}
+          </button>
+        </div>
+      </form>
+    }
+  </app-ui-card>
+</section>

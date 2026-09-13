@@ -93,6 +93,11 @@ export const routes: Routes = [
           import('./features/inventory/inventory.routes').then((m) => m.INVENTORY_ROUTES)
       },
       {
+        path: 'billing',
+        loadChildren: () =>
+          import('./features/billing/billing.routes').then((m) => m.BILLING_ROUTES)
+      },
+      {
         path: 'notifications',
         loadChildren: () =>
           import('./features/notifications/notifications.routes').then((m) => m.NOTIFICATIONS_ROUTES)

@@ -4,7 +4,8 @@
  */
 export const ModuleCodes = {
   Hrms: 'HRMS',
-  Inventory: 'INVENTORY'
+  Inventory: 'INVENTORY',
+  Billing: 'BILLING'
 } as const;
 
 export const FeatureCodes = {
@@ -17,5 +18,10 @@ export const FeatureCodes = {
 
   InventoryItem: 'INVENTORY_ITEM',
   InventoryStock: 'INVENTORY_STOCK',
-  InventoryPurchase: 'INVENTORY_PURCHASE'
+  InventoryPurchase: 'INVENTORY_PURCHASE',
+
+  BillingInvoice: 'BILLING_INVOICE',
+  BillingPayment: 'BILLING_PAYMENT',
+  /** Cataloged for future credit notes/refunds — not used in Phase 11B UI. */
+  BillingRefund: 'BILLING_REFUND'
 } as const;

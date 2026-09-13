@@ -1,0 +1,96 @@
+<section class="page">
+  <app-page-header title="Invoices">
+    <ng-container *appHasPermission="permissionCodes.BillingInvoiceManage">
+      <a class="btn btn--primary" routerLink="new">Add</a>
+    </ng-container>
+  </app-page-header>
+
+  <app-ui-card title="Invoices">
+    <form class="filters" [formGroup]="filters" (ngSubmit)="load()">
+      <label class="form-field">
+        <span class="form-label">Customer</span>
+        <select class="form-input" formControlName="customerId">
+          <option [ngValue]="null">All</option>
+          @for (customer of customers(); track customer.customerId) {
+            <option [ngValue]="customer.customerId">{{ customer.customerName }}</option>
+          }
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Status</span>
+        <select class="form-input" formControlName="status">
+          <option value="">All</option>
+          <option [value]="statuses.Draft">Draft</option>
+          <option [value]="statuses.Approved">Approved</option>
+          <option [value]="statuses.PartiallyPaid">Partially paid</option>
+          <option [value]="statuses.Paid">Paid</option>
+          <option [value]="statuses.Cancelled">Cancelled</option>
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Branch</span>
+        <select class="form-input" formControlName="branchId">
+          <option [ngValue]="null">All</option>
+          @for (branch of branches(); track branch.branchId) {
+            <option [ngValue]="branch.branchId">{{ branch.branchName }}</option>
+          }
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">From date</span>
+        <input class="form-input" type="date" formControlName="fromDate" />
+      </label>
+      <label class="form-field">
+        <span class="form-label">To date</span>
+        <input class="form-input" type="date" formControlName="toDate" />
+      </label>
+      <button class="btn btn--secondary" type="submit">Apply</button>
+    </form>
+
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else if (!rows().length) {
+      <app-empty-state title="No invoices" message="Nothing found.">
+        <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+      </app-empty-state>
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Invoice #</th>
+              <th>Date</th>
+              <th>Customer</th>
+              <th>Status</th>
+              <th>Total</th>
+              <th>Outstanding</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.invoiceId) {
+              <tr>
+                <td>{{ draftInvoiceNumberLabel(row.invoiceNumber) }}</td>
+                <td>{{ row.invoiceDate | date: 'mediumDate' }}</td>
+                <td>{{ customerName(row.customerId) }}</td>
+                <td>
+                  <span class="status-pill" [class]="invoiceStatusClass(row.status)">
+                    {{ invoiceStatusLabel(row.status) }}
+                  </span>
+                </td>
+                <td>{{ formatMoney(row.totalAmount, row.currencyCode) }}</td>
+                <td>{{ formatMoney(row.outstandingAmount, row.currencyCode) }}</td>
+                <td class="data-table__actions">
+                  <a class="btn btn--secondary" [routerLink]="[row.invoiceId]">View</a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+</section>

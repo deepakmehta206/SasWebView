@@ -81,7 +81,14 @@ export const PermissionCodes = {
   InventoryStockTransfer: 'INVENTORY_STOCK_TRANSFER',
   InventoryPurchaseManage: 'INVENTORY_PURCHASE_MANAGE',
   InventoryPurchaseApprove: 'INVENTORY_PURCHASE_APPROVE',
-  InventoryReceiptCreate: 'INVENTORY_RECEIPT_CREATE'
+  InventoryReceiptCreate: 'INVENTORY_RECEIPT_CREATE',
+
+  BillingView: 'BILLING_VIEW',
+  BillingCustomerManage: 'BILLING_CUSTOMER_MANAGE',
+  BillingInvoiceManage: 'BILLING_INVOICE_MANAGE',
+  BillingInvoiceApprove: 'BILLING_INVOICE_APPROVE',
+  BillingInvoiceCancel: 'BILLING_INVOICE_CANCEL',
+  BillingPaymentManage: 'BILLING_PAYMENT_MANAGE'
 } as const;
 
 export type PermissionCode = (typeof PermissionCodes)[keyof typeof PermissionCodes];
