@@ -58,6 +58,12 @@ export class SettingsHubComponent {
       description: 'View and manage in-app, email, SMS, and WhatsApp message templates.',
       route: '/settings/notification-templates',
       anyPermissions: [PermissionCodes.NotificationTemplateView]
+    },
+    {
+      title: 'Files',
+      description: 'Upload, download, and soft-delete tenant files.',
+      route: '/settings/files',
+      anyPermissions: [PermissionCodes.FileView]
     }
   ];
 

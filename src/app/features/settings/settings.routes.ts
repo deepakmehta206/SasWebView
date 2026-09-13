@@ -80,5 +80,12 @@ export const SETTINGS_ROUTES: Routes = [
       import('../notifications/pages/notification-template-form/notification-template-form.component').then(
         (m) => m.NotificationTemplateFormComponent
       )
+  },
+  {
+    path: 'files',
+    canActivate: [permissionGuard],
+    data: { permission: PermissionCodes.FileView },
+    loadComponent: () =>
+      import('../files/pages/file-list/file-list.component').then((m) => m.FileListComponent)
   }
 ];

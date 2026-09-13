@@ -226,6 +226,14 @@ export class ShellComponent {
       return 'Tenant features';
     }
 
+    if (url.startsWith('/settings/notification-templates')) {
+      return 'Notification templates';
+    }
+
+    if (url.startsWith('/settings/files')) {
+      return 'Files';
+    }
+
     if (url.startsWith('/settings')) {
       return 'Settings';
     }

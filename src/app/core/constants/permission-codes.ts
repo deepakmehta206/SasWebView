@@ -65,7 +65,11 @@ export const PermissionCodes = {
   NotificationManage: 'NOTIFICATION_MANAGE',
   NotificationTemplateView: 'NOTIFICATION_TEMPLATE_VIEW',
   NotificationTemplateManage: 'NOTIFICATION_TEMPLATE_MANAGE',
-  NotificationPreferenceEdit: 'NOTIFICATION_PREFERENCE_EDIT'
+  NotificationPreferenceEdit: 'NOTIFICATION_PREFERENCE_EDIT',
+
+  FileView: 'FILE_VIEW',
+  FileUpload: 'FILE_UPLOAD',
+  FileDelete: 'FILE_DELETE'
 } as const;
 
 export type PermissionCode = (typeof PermissionCodes)[keyof typeof PermissionCodes];

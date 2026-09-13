@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -35,6 +35,24 @@ export class ApiService {
 
   delete<T>(path: string, options?: ApiRequestOptions): Observable<T> {
     return this.http.delete<T>(this.url(path), options);
+  }
+
+  /**
+   * Multipart POST. Do not set Content-Type — browser must supply the boundary.
+   */
+  postFormData<T>(path: string, formData: FormData, options?: ApiRequestOptions): Observable<T> {
+    return this.http.post<T>(this.url(path), formData, options);
+  }
+
+  /**
+   * Authenticated binary download with response headers (Content-Disposition).
+   */
+  getBlobResponse(path: string, options?: ApiRequestOptions): Observable<HttpResponse<Blob>> {
+    return this.http.get(this.url(path), {
+      ...options,
+      observe: 'response',
+      responseType: 'blob'
+    });
   }
 
   private url(path: string): string {

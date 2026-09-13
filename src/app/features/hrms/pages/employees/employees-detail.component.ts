@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -11,6 +11,17 @@ import { PermissionCodes } from '../../../../core/constants/permission-codes';
 import { PermissionService } from '../../../../core/permissions/permission.service';
 import { extractApiErrorMessage } from '../../../../core/utils/api-error.util';
 import { MasterApiService } from '../../../masters/services/master-api.service';
+import { FilesApiService } from '../../../files/services/files-api.service';
+import {
+  FILE_ACCEPT_ATTR,
+  FILE_ALLOWED_EXTENSIONS,
+  FILE_MAX_SIZE_BYTES
+} from '../../../files/models/files.models';
+import {
+  formatFileSize,
+  triggerBrowserDownload,
+  validateClientFile
+} from '../../../files/utils/file-display.util';
 import { HrmsApiService } from '../../services/hrms-api.service';
 import {
   EmployeeDocumentDto,
@@ -41,16 +52,23 @@ interface DocumentTypeRow {
   styleUrl: './employees-detail.component.scss'
 })
 export class EmployeeDetailComponent implements OnInit {
+  @ViewChild('documentFileInput') private readonly documentFileInput?: ElementRef<HTMLInputElement>;
+
   private readonly api = inject(HrmsApiService);
+  private readonly filesApi = inject(FilesApiService);
   private readonly masters = inject(MasterApiService);
   private readonly route = inject(ActivatedRoute);
   private readonly fb = inject(FormBuilder);
   private readonly permissions = inject(PermissionService);
 
   readonly permissionCodes = PermissionCodes;
+  readonly acceptAttr = FILE_ACCEPT_ATTR;
+  readonly formatSize = formatFileSize;
+
   readonly loading = signal(true);
   readonly savingProfile = signal(false);
   readonly savingDocument = signal(false);
+  readonly downloadingId = signal<number | null>(null);
   readonly errorMessage = signal<string | null>(null);
   readonly sensitiveError = signal<string | null>(null);
   readonly employee = signal<EmployeeDto | null>(null);
@@ -58,7 +76,10 @@ export class EmployeeDetailComponent implements OnInit {
   readonly sensitive = signal<SensitiveEmployeeProfileDto | null>(null);
   readonly documents = signal<EmployeeDocumentDto[]>([]);
   readonly documentTypes = signal<DocumentTypeRow[]>([]);
+  readonly selectedFile = signal<File | null>(null);
   readonly canViewSensitive = this.permissions.hasPermission(PermissionCodes.EmployeeProfileSensitive);
+  readonly canUploadFile = this.permissions.hasPermission(PermissionCodes.FileUpload);
+  readonly canDownloadFile = this.permissions.hasPermission(PermissionCodes.FileView);
 
   private employeeId = 0;
 
@@ -84,7 +105,6 @@ export class EmployeeDetailComponent implements OnInit {
   readonly documentForm = this.fb.nonNullable.group({
     documentTypeId: [0 as number, [Validators.required, Validators.min(1)]],
     documentNumber: [''],
-    fileId: [null as number | null],
     issueDate: [''],
     expiryDate: [''],
     status: ['ACTIVE']
@@ -212,41 +232,126 @@ export class EmployeeDetailComponent implements OnInit {
     });
   }
 
+  openDocumentFilePicker(): void {
+    if (!this.canUploadFile || this.savingDocument()) {
+      return;
+    }
+    this.documentFileInput?.nativeElement.click();
+  }
+
+  onDocumentFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    input.value = '';
+
+    if (!file) {
+      this.selectedFile.set(null);
+      return;
+    }
+
+    const validationError = validateClientFile(file, FILE_ALLOWED_EXTENSIONS, FILE_MAX_SIZE_BYTES);
+    if (validationError) {
+      this.selectedFile.set(null);
+      this.errorMessage.set(validationError);
+      return;
+    }
+
+    this.errorMessage.set(null);
+    this.selectedFile.set(file);
+  }
+
+  clearSelectedFile(): void {
+    this.selectedFile.set(null);
+    if (this.documentFileInput) {
+      this.documentFileInput.nativeElement.value = '';
+    }
+  }
+
   addDocument(): void {
     if (this.documentForm.invalid || this.savingDocument()) {
       this.documentForm.markAllAsTouched();
       return;
     }
+
     this.savingDocument.set(true);
     this.errorMessage.set(null);
     const value = this.documentForm.getRawValue();
-    this.api
-      .createEmployeeDocument(this.employeeId, {
-        documentTypeId: Number(value.documentTypeId),
-        documentNumber: value.documentNumber.trim() || null,
-        fileId: value.fileId ? Number(value.fileId) : null,
-        issueDate: value.issueDate || null,
-        expiryDate: value.expiryDate || null,
-        status: value.status || 'ACTIVE'
-      })
-      .subscribe({
-        next: () => {
-          this.savingDocument.set(false);
-          this.documentForm.reset({
-            documentTypeId: 0,
-            documentNumber: '',
-            fileId: null,
-            issueDate: '',
-            expiryDate: '',
-            status: 'ACTIVE'
-          });
-          this.loadDocuments();
-        },
-        error: (error) => {
-          this.errorMessage.set(extractApiErrorMessage(error, 'Unable to add document.'));
+    const file = this.selectedFile();
+
+    const createDocument = (fileId: number | null): void => {
+      this.api
+        .createEmployeeDocument(this.employeeId, {
+          documentTypeId: Number(value.documentTypeId),
+          documentNumber: value.documentNumber.trim() || null,
+          fileId,
+          issueDate: value.issueDate || null,
+          expiryDate: value.expiryDate || null,
+          status: value.status || 'ACTIVE'
+        })
+        .subscribe({
+          next: () => {
+            this.savingDocument.set(false);
+            this.documentForm.reset({
+              documentTypeId: 0,
+              documentNumber: '',
+              issueDate: '',
+              expiryDate: '',
+              status: 'ACTIVE'
+            });
+            this.clearSelectedFile();
+            this.loadDocuments();
+          },
+          error: (error) => {
+            this.errorMessage.set(
+              extractApiErrorMessage(
+                error,
+                fileId
+                  ? 'File uploaded, but the document record could not be created. The file was kept.'
+                  : 'Unable to add document.'
+              )
+            );
+            this.savingDocument.set(false);
+          }
+        });
+    };
+
+    if (file) {
+      if (!this.canUploadFile) {
+        this.errorMessage.set('You do not have permission to upload files.');
+        this.savingDocument.set(false);
+        return;
+      }
+
+      this.filesApi.upload(file).subscribe({
+        next: (uploaded) => createDocument(uploaded.fileId),
+        error: (error: unknown) => {
+          this.errorMessage.set(extractApiErrorMessage(error, 'Unable to upload file.'));
           this.savingDocument.set(false);
         }
       });
+      return;
+    }
+
+    createDocument(null);
+  }
+
+  downloadDocumentFile(fileId: number, fallbackName?: string | null): void {
+    if (!this.canDownloadFile) {
+      return;
+    }
+
+    this.downloadingId.set(fileId);
+    this.errorMessage.set(null);
+    this.filesApi.download(fileId, fallbackName ?? `document-${fileId}`).subscribe({
+      next: (result) => {
+        triggerBrowserDownload(result.blob, result.fileName);
+        this.downloadingId.set(null);
+      },
+      error: (error: unknown) => {
+        this.downloadingId.set(null);
+        this.errorMessage.set(extractApiErrorMessage(error, 'File not found.'));
+      }
+    });
   }
 
   deleteDocument(documentId: number): void {

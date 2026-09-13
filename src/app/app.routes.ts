@@ -45,7 +45,8 @@ export const routes: Routes = [
           anyPermissions: [
             PermissionCodes.TenantView,
             PermissionCodes.SettingsView,
-            PermissionCodes.NotificationTemplateView
+            PermissionCodes.NotificationTemplateView,
+            PermissionCodes.FileView
           ]
         },
         loadChildren: () =>

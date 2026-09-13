@@ -78,7 +78,7 @@
                 <tr>
                   <th>Type</th>
                   <th>Number</th>
-                  <th>File ID</th>
+                  <th>File</th>
                   <th>Issue</th>
                   <th>Expiry</th>
                   <th>Status</th>
@@ -90,11 +90,21 @@
                   <tr>
                     <td>{{ doc.documentTypeId }}</td>
                     <td>{{ doc.documentNumber || '—' }}</td>
-                    <td>{{ doc.fileId || '—' }}</td>
+                    <td>{{ doc.fileId ? 'Attached' : '—' }}</td>
                     <td>{{ doc.issueDate || '—' }}</td>
                     <td>{{ doc.expiryDate || '—' }}</td>
                     <td>{{ doc.status }}</td>
-                    <td>
+                    <td class="doc-actions">
+                      @if (doc.fileId && canDownloadFile) {
+                        <button
+                          type="button"
+                          class="btn btn--secondary"
+                          [disabled]="downloadingId() === doc.fileId"
+                          (click)="downloadDocumentFile(doc.fileId)"
+                        >
+                          {{ downloadingId() === doc.fileId ? 'Downloading…' : 'Download' }}
+                        </button>
+                      }
                       <ng-container *appHasPermission="permissionCodes.EmployeeEdit">
                         <button type="button" class="btn btn--secondary" (click)="deleteDocument(doc.employeeDocumentId)">
                           Delete
@@ -122,11 +132,65 @@
                 }
               </select>
             </label>
-            <label class="form-field"><span class="form-label">Document number</span><input class="form-input" formControlName="documentNumber" /></label>
-            <label class="form-field"><span class="form-label">File ID</span><input class="form-input" type="number" formControlName="fileId" /></label>
-            <label class="form-field"><span class="form-label">Issue date</span><input class="form-input" type="date" formControlName="issueDate" /></label>
-            <label class="form-field"><span class="form-label">Expiry date</span><input class="form-input" type="date" formControlName="expiryDate" /></label>
-            <label class="form-field"><span class="form-label">Status</span><input class="form-input" formControlName="status" /></label>
+            <label class="form-field">
+              <span class="form-label">Document number</span>
+              <input class="form-input" formControlName="documentNumber" />
+            </label>
+
+            @if (canUploadFile) {
+              <div class="form-field form-field--full">
+                <span class="form-label">File</span>
+                <div class="file-picker">
+                  <button
+                    type="button"
+                    class="btn btn--secondary"
+                    (click)="openDocumentFilePicker()"
+                    [disabled]="savingDocument()"
+                  >
+                    Choose file
+                  </button>
+                  @if (selectedFile(); as file) {
+                    <span class="file-picker__name">
+                      {{ file.name }} ({{ formatSize(file.size) }})
+                    </span>
+                    <button
+                      type="button"
+                      class="btn btn--ghost"
+                      (click)="clearSelectedFile()"
+                      [disabled]="savingDocument()"
+                    >
+                      Clear
+                    </button>
+                  } @else {
+                    <span class="file-picker__hint">Optional — PDF, PNG, JPG, or DOCX up to 10 MB</span>
+                  }
+                </div>
+                <input
+                  #documentFileInput
+                  type="file"
+                  class="visually-hidden"
+                  [accept]="acceptAttr"
+                  (change)="onDocumentFileSelected($event)"
+                />
+              </div>
+            } @else {
+              <p class="form-field form-field--full form-hint">
+                File upload requires FILE_UPLOAD permission. You can still save document metadata without a file.
+              </p>
+            }
+
+            <label class="form-field">
+              <span class="form-label">Issue date</span>
+              <input class="form-input" type="date" formControlName="issueDate" />
+            </label>
+            <label class="form-field">
+              <span class="form-label">Expiry date</span>
+              <input class="form-input" type="date" formControlName="expiryDate" />
+            </label>
+            <label class="form-field">
+              <span class="form-label">Status</span>
+              <input class="form-input" formControlName="status" />
+            </label>
             <div class="form-actions">
               <button class="btn btn--primary" type="submit" [disabled]="savingDocument()">
                 {{ savingDocument() ? 'Saving…' : 'Add document' }}

@@ -1,0 +1,126 @@
+<section class="file-list">
+  <app-page-header
+    title="Files"
+    subtitle="Upload and manage tenant files. Downloads go through the authenticated API."
+  >
+    <a class="btn btn--ghost" routerLink="/settings">Back to settings</a>
+    <button type="button" class="btn btn--ghost" (click)="reload()" [disabled]="loading()">
+      Refresh
+    </button>
+    <ng-container *appHasPermission="permissionCodes.FileUpload">
+      <button
+        type="button"
+        class="btn btn--primary"
+        (click)="openFilePicker()"
+        [disabled]="uploading()"
+      >
+        {{ uploading() ? 'Uploading…' : 'Upload' }}
+      </button>
+    </ng-container>
+  </app-page-header>
+
+  <input
+    #fileInput
+    type="file"
+    class="visually-hidden"
+    [accept]="acceptAttr"
+    (change)="onFileSelected($event)"
+  />
+
+  @if (errorMessage()) {
+    <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+  }
+  @if (successMessage()) {
+    <div class="alert alert--success" role="status">{{ successMessage() }}</div>
+  }
+
+  <app-ui-card title="Filters">
+    <label class="file-list__toggle">
+      <input
+        type="checkbox"
+        [checked]="showDeleted()"
+        (change)="onShowDeletedChange($any($event.target).checked)"
+      />
+      <span>Show deleted</span>
+    </label>
+  </app-ui-card>
+
+  <app-ui-card>
+    @if (loading() && rows().length === 0) {
+      <app-loading-indicator label="Loading files…" />
+    } @else if (rows().length === 0) {
+      <app-empty-state
+        title="No files yet."
+        message="Upload a PDF, image, or Word document to get started."
+      />
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th scope="col">File name</th>
+              <th scope="col">Type</th>
+              <th scope="col">Size</th>
+              <th scope="col">Status</th>
+              <th scope="col">Created</th>
+              <th scope="col"><span class="visually-hidden">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.fileId) {
+              <tr [class.file-list__row--inactive]="!row.isActive">
+                <td class="file-list__name">{{ row.originalFileName }}</td>
+                <td>{{ row.fileExtension || row.contentType }}</td>
+                <td>{{ formatSize(row.fileSizeBytes) }}</td>
+                <td>
+                  @if (row.isActive) {
+                    <span class="status-pill status-pill--accent">{{ row.status }}</span>
+                  } @else {
+                    <span class="status-pill">{{ row.status }}</span>
+                  }
+                </td>
+                <td>{{ formatDate(row.createdDate) }}</td>
+                <td class="file-list__actions">
+                  @if (row.isActive) {
+                    <button
+                      type="button"
+                      class="btn btn--ghost btn--sm"
+                      [disabled]="actingId() === row.fileId"
+                      (click)="download(row)"
+                    >
+                      Download
+                    </button>
+                  }
+                  <ng-container *appHasPermission="permissionCodes.FileDelete">
+                    @if (row.isActive) {
+                      <button
+                        type="button"
+                        class="btn btn--ghost btn--sm"
+                        [disabled]="actingId() === row.fileId"
+                        (click)="delete(row)"
+                      >
+                        Delete
+                      </button>
+                    }
+                  </ng-container>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (hasMore()) {
+        <div class="file-list__more">
+          <button type="button" class="btn btn--secondary" (click)="loadMore()" [disabled]="loading()">
+            {{ loading() ? 'Loading…' : 'Load more' }}
+          </button>
+        </div>
+      }
+    }
+
+    @if (uploading()) {
+      <app-loading-indicator label="Uploading file…" />
+    }
+  </app-ui-card>
+</section>
