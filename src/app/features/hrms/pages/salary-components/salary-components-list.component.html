@@ -1,0 +1,50 @@
+<section class="page">
+  <app-page-header title="Salary components">
+    <ng-container *appHasPermission="permissionCodes.PayrollProcess">
+      <a class="btn btn--primary" routerLink="new">Add</a>
+    </ng-container>
+  </app-page-header>
+  <app-ui-card title="Salary components">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else if (!rows().length) {
+      <app-empty-state title="No salary components" message="Nothing found.">
+        <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+      </app-empty-state>
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Calculation</th>
+              <th>Active</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.salaryComponentId) {
+              <tr>
+                <td>{{ row.componentCode }}</td>
+                <td>{{ row.componentName }}</td>
+                <td>{{ row.componentType }}</td>
+                <td>{{ row.calculationType }}</td>
+                <td>{{ row.isActive ? 'Yes' : 'No' }}</td>
+                <td>
+                  <ng-container *appHasPermission="permissionCodes.PayrollProcess">
+                    <a class="btn btn--secondary" [routerLink]="[row.salaryComponentId, 'edit']">Edit</a>
+                  </ng-container>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+</section>

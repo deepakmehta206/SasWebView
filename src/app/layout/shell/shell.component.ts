@@ -122,6 +122,70 @@ export class ShellComponent {
       return 'Subscription';
     }
 
+    if (url.includes('/masters/') && url.endsWith('/edit')) {
+      return 'Edit master';
+    }
+
+    if (url.includes('/masters/') && url.endsWith('/new')) {
+      return 'Add master';
+    }
+
+    if (url.startsWith('/masters/')) {
+      return 'Masters';
+    }
+
+    if (url.startsWith('/masters')) {
+      return 'Masters';
+    }
+
+    if (url.startsWith('/hrms/employees')) {
+      return 'Employees';
+    }
+
+    if (url.startsWith('/hrms/departments')) {
+      return 'Departments';
+    }
+
+    if (url.startsWith('/hrms/designations')) {
+      return 'Designations';
+    }
+
+    if (url.startsWith('/hrms/employee-types')) {
+      return 'Employee types';
+    }
+
+    if (url.startsWith('/hrms/shifts')) {
+      return 'Shifts';
+    }
+
+    if (url.startsWith('/hrms/holidays')) {
+      return 'Holidays';
+    }
+
+    if (url.startsWith('/hrms/attendance')) {
+      return 'Attendance';
+    }
+
+    if (url.startsWith('/hrms/overtime')) {
+      return 'Overtime';
+    }
+
+    if (url.startsWith('/hrms/leave')) {
+      return 'Leave';
+    }
+
+    if (url.startsWith('/hrms/salary')) {
+      return 'Salary';
+    }
+
+    if (url.startsWith('/hrms/payroll')) {
+      return 'Payroll';
+    }
+
+    if (url.startsWith('/hrms')) {
+      return 'HRMS';
+    }
+
     if (url.startsWith('/profile')) {
       return 'My profile';
     }

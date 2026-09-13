@@ -1,0 +1,50 @@
+<section class="page">
+  <app-page-header title="Holidays">
+    <ng-container *appHasPermission="permissionCodes.AttendanceEdit">
+      <a class="btn btn--primary" routerLink="new">Add</a>
+    </ng-container>
+  </app-page-header>
+  <app-ui-card title="Holidays">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else if (!rows().length) {
+      <app-empty-state title="No holidays" message="Nothing found.">
+        <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+      </app-empty-state>
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Optional</th>
+              <th>Active</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.holidayId) {
+              <tr>
+                <td>{{ row.holidayDate }}</td>
+                <td>{{ row.holidayName }}</td>
+                <td>{{ row.holidayType || '—' }}</td>
+                <td>{{ row.isOptional ? 'Yes' : 'No' }}</td>
+                <td>{{ row.isActive ? 'Yes' : 'No' }}</td>
+                <td>
+                  <ng-container *appHasPermission="permissionCodes.AttendanceEdit">
+                    <a class="btn btn--secondary" [routerLink]="[row.holidayId, 'edit']">Edit</a>
+                  </ng-container>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+</section>

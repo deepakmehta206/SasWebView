@@ -1,0 +1,56 @@
+<section class="page">
+  <app-page-header title="Payslip">
+    <a class="btn btn--secondary" routerLink="/hrms/payroll/payslips">Back</a>
+  </app-page-header>
+
+  @if (errorMessage()) {
+    <div class="alert alert--danger">{{ errorMessage() }}</div>
+  }
+
+  @if (loading()) {
+    <app-loading-indicator label="Loading…" />
+  } @else {
+    @if (payslip(); as item) {
+      <app-ui-card title="Amounts">
+        <dl class="detail-list">
+          <div><dt>Number</dt><dd>{{ item.payslipNumber }}</dd></div>
+          <div><dt>Employee</dt><dd>{{ item.employeeId }}</dd></div>
+          <div><dt>Period</dt><dd>{{ item.payrollMonth }}/{{ item.payrollYear }}</dd></div>
+          <div><dt>Gross</dt><dd>{{ item.grossAmount }}</dd></div>
+          <div><dt>Deductions</dt><dd>{{ item.deductionAmount }}</dd></div>
+          <div><dt>Net</dt><dd>{{ item.netAmount }}</dd></div>
+          <div><dt>Generated</dt><dd>{{ item.generatedDate }}</dd></div>
+        </dl>
+      </app-ui-card>
+
+      <app-ui-card title="Components">
+        @if (!item.components.length) {
+          <app-empty-state title="No components" message="No component breakdown available." />
+        } @else {
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (component of item.components; track component.payrollComponentDetailId) {
+                  <tr>
+                    <td>{{ component.componentCode || component.salaryComponentId }}</td>
+                    <td>{{ component.componentName || '—' }}</td>
+                    <td>{{ component.componentType || '—' }}</td>
+                    <td>{{ component.amount }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </app-ui-card>
+    }
+  }
+</section>

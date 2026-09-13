@@ -1,0 +1,99 @@
+<section class="page">
+  <app-page-header title="Payroll run">
+    <a class="btn btn--secondary" routerLink="/hrms/payroll/runs">Back</a>
+  </app-page-header>
+
+  @if (errorMessage()) {
+    <div class="alert alert--danger">{{ errorMessage() }}</div>
+  }
+
+  @if (loading()) {
+    <app-loading-indicator label="Loading…" />
+  } @else {
+    @if (run(); as item) {
+      <app-ui-card title="Summary">
+        <dl class="detail-list">
+          <div><dt>Period</dt><dd>{{ item.payrollMonth }}/{{ item.payrollYear }}</dd></div>
+          <div><dt>Branch</dt><dd>{{ item.branchId }}</dd></div>
+          <div><dt>Employees</dt><dd>{{ item.employeeCount }}</dd></div>
+          <div><dt>Gross</dt><dd>{{ item.grossAmount }}</dd></div>
+          <div><dt>Deductions</dt><dd>{{ item.deductionAmount }}</dd></div>
+          <div><dt>Net</dt><dd>{{ item.netAmount }}</dd></div>
+          <div><dt>Status</dt><dd>{{ item.status }}</dd></div>
+        </dl>
+        <div class="form-actions">
+          <ng-container *appHasPermission="permissionCodes.PayrollProcess">
+            <button
+              type="button"
+              class="btn btn--primary"
+              [disabled]="acting() || item.status === 'LOCKED' || item.status !== 'DRAFT'"
+              (click)="process()"
+            >
+              Process
+            </button>
+          </ng-container>
+          <ng-container *appHasPermission="permissionCodes.PayrollApprove">
+            <button
+              type="button"
+              class="btn btn--secondary"
+              [disabled]="acting() || item.status === 'LOCKED' || item.status !== 'PROCESSED'"
+              (click)="approve()"
+            >
+              Approve
+            </button>
+          </ng-container>
+          <ng-container *appHasPermission="permissionCodes.PayrollLock">
+            <button
+              type="button"
+              class="btn btn--secondary"
+              [disabled]="acting() || item.status === 'LOCKED' || item.status !== 'APPROVED'"
+              (click)="lock()"
+            >
+              Lock
+            </button>
+          </ng-container>
+        </div>
+      </app-ui-card>
+
+      <app-ui-card title="Details">
+        @if (!item.details.length) {
+          <app-empty-state title="No details" message="No payroll details yet." />
+        } @else {
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Basic</th>
+                  <th>Gross</th>
+                  <th>Deductions</th>
+                  <th>Net</th>
+                  <th>Present</th>
+                  <th>LOP</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (detail of item.details; track detail.payrollDetailId) {
+                  <tr>
+                    <td>
+                      {{ detail.employeeCode || detail.employeeId }}
+                      @if (detail.firstName) {
+                        — {{ detail.firstName }} {{ detail.lastName }}
+                      }
+                    </td>
+                    <td>{{ detail.basicAmount }}</td>
+                    <td>{{ detail.grossAmount }}</td>
+                    <td>{{ detail.deductionAmount }}</td>
+                    <td>{{ detail.netAmount }}</td>
+                    <td>{{ detail.presentDays }}</td>
+                    <td>{{ detail.lopDays }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </app-ui-card>
+    }
+  }
+</section>

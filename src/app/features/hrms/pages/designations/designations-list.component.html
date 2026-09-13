@@ -1,0 +1,30 @@
+<section class="page">
+  <app-page-header title="Designations">
+    <ng-container *appHasPermission="permissionCodes.EmployeeEdit">
+      <a class="btn btn--primary" routerLink="new">Add</a>
+    </ng-container>
+  </app-page-header>
+  <app-ui-card title="Designations">
+    @if (errorMessage()) { <div class="alert alert--danger">{{ errorMessage() }}</div> }
+    @if (loading()) { <app-loading-indicator label="Loading…" /> }
+    @else if (!rows().length) {
+      <app-empty-state title="No records" message="Nothing found.">
+        <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+      </app-empty-state>
+    } @else {
+      <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>Code</th><th>Name</th><th>Active</th><th></th></tr></thead>
+        <tbody>
+          @for (row of rows(); track row.designationId) {
+            <tr>
+              <td>{{ row.designationCode }}</td><td>{{ row.designationName }}</td><td>{{ row.isActive ? 'Yes' : 'No' }}</td>
+              <td><ng-container *appHasPermission="permissionCodes.EmployeeEdit">
+                <a class="btn btn--secondary" [routerLink]="[row.designationId, 'edit']">Edit</a>
+              </ng-container></td>
+            </tr>
+          }
+        </tbody>
+      </table></div>
+    }
+  </app-ui-card>
+</section>

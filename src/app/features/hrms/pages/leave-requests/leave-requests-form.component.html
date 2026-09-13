@@ -1,0 +1,48 @@
+<section class="page">
+  <app-page-header title="Apply leave">
+    <a class="btn btn--secondary" routerLink="/hrms/leave/requests">Back</a>
+  </app-page-header>
+  <app-ui-card title="Leave request">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+      <label class="form-field">
+        <span class="form-label">Branch</span>
+        <select class="form-input" formControlName="branchId">
+          <option [ngValue]="0" disabled>Select</option>
+          @for (branch of branches(); track branch.branchId) {
+            <option [ngValue]="branch.branchId">{{ branch.branchCode }} — {{ branch.branchName }}</option>
+          }
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Employee</span>
+        <select class="form-input" formControlName="employeeId">
+          <option [ngValue]="0" disabled>Select</option>
+          @for (employee of employees(); track employee.employeeId) {
+            <option [ngValue]="employee.employeeId">
+              {{ employee.employeeCode }} — {{ employee.firstName }} {{ employee.lastName }}
+            </option>
+          }
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Leave type</span>
+        <select class="form-input" formControlName="leaveTypeId">
+          <option [ngValue]="0" disabled>Select</option>
+          @for (lt of leaveTypes(); track lt.leaveTypeId) {
+            <option [ngValue]="lt.leaveTypeId">{{ lt.leaveCode }} — {{ lt.leaveName }}</option>
+          }
+        </select>
+      </label>
+      <label class="form-field"><span class="form-label">From</span><input class="form-input" type="date" formControlName="fromDate" /></label>
+      <label class="form-field"><span class="form-label">To</span><input class="form-input" type="date" formControlName="toDate" /></label>
+      <label class="form-field"><span class="form-label">Total days</span><input class="form-input" type="number" step="0.5" formControlName="totalDays" /></label>
+      <label class="form-field form-field--full"><span class="form-label">Reason</span><textarea class="form-input" formControlName="reason"></textarea></label>
+      <div class="form-actions">
+        <button class="btn btn--primary" type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Submit' }}</button>
+      </div>
+    </form>
+  </app-ui-card>
+</section>

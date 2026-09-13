@@ -1,0 +1,46 @@
+<section class="page">
+  <app-page-header title="Payslips" />
+  <app-ui-card title="Payslips">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else if (!rows().length) {
+      <app-empty-state title="No payslips" message="Nothing found.">
+        <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+      </app-empty-state>
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Number</th>
+              <th>Employee</th>
+              <th>Period</th>
+              <th>Gross</th>
+              <th>Deductions</th>
+              <th>Net</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.payslipId) {
+              <tr>
+                <td>{{ row.payslipNumber }}</td>
+                <td>{{ row.employeeId }}</td>
+                <td>{{ row.payrollMonth }}/{{ row.payrollYear }}</td>
+                <td>{{ row.grossAmount }}</td>
+                <td>{{ row.deductionAmount }}</td>
+                <td>{{ row.netAmount }}</td>
+                <td>
+                  <a class="btn btn--secondary" [routerLink]="[row.payslipId]">View</a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+</section>

@@ -1,0 +1,75 @@
+<section class="page">
+  <app-page-header title="Employees">
+    <ng-container *appHasPermission="permissionCodes.EmployeeAdd">
+      <a class="btn btn--primary" routerLink="new">Add</a>
+    </ng-container>
+  </app-page-header>
+  <app-ui-card title="Filters">
+    <form class="filters" [formGroup]="filters" (ngSubmit)="load()">
+      <label class="form-field">
+        <span class="form-label">Branch</span>
+        <select class="form-input" formControlName="branchId">
+          <option [ngValue]="null">All</option>
+          @for (branch of branches(); track branch.branchId) {
+            <option [ngValue]="branch.branchId">{{ branch.branchCode }} — {{ branch.branchName }}</option>
+          }
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Active</span>
+        <select class="form-input" formControlName="isActive">
+          <option [ngValue]="null">All</option>
+          <option [ngValue]="true">Active</option>
+          <option [ngValue]="false">Inactive</option>
+        </select>
+      </label>
+      <div class="form-actions">
+        <button class="btn btn--secondary" type="submit">Apply</button>
+      </div>
+    </form>
+  </app-ui-card>
+  <app-ui-card title="Employees">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else if (!rows().length) {
+      <app-empty-state title="No employees" message="Nothing found.">
+        <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+      </app-empty-state>
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Branch</th>
+              <th>Status</th>
+              <th>Active</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.employeeId) {
+              <tr>
+                <td>{{ row.employeeCode }}</td>
+                <td>{{ row.firstName }} {{ row.lastName }}</td>
+                <td>{{ row.branchId }}</td>
+                <td>{{ row.status }}</td>
+                <td>{{ row.isActive ? 'Yes' : 'No' }}</td>
+                <td class="data-table__actions">
+                  <a class="btn btn--secondary" [routerLink]="[row.employeeId]">View</a>
+                  <ng-container *appHasPermission="permissionCodes.EmployeeEdit">
+                    <a class="btn btn--secondary" [routerLink]="[row.employeeId, 'edit']">Edit</a>
+                  </ng-container>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+</section>

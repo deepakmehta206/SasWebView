@@ -1,0 +1,48 @@
+<section class="page">
+  <app-page-header title="Payroll runs">
+    <ng-container *appHasPermission="permissionCodes.PayrollProcess">
+      <a class="btn btn--primary" routerLink="new">Create</a>
+    </ng-container>
+  </app-page-header>
+  <app-ui-card title="Payroll runs">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else if (!rows().length) {
+      <app-empty-state title="No payroll runs" message="Nothing found.">
+        <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+      </app-empty-state>
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Period</th>
+              <th>Branch</th>
+              <th>Employees</th>
+              <th>Net</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.payrollRunId) {
+              <tr>
+                <td>{{ row.payrollMonth }}/{{ row.payrollYear }}</td>
+                <td>{{ row.branchId }}</td>
+                <td>{{ row.employeeCount }}</td>
+                <td>{{ row.netAmount }}</td>
+                <td>{{ row.status }}</td>
+                <td>
+                  <a class="btn btn--secondary" [routerLink]="[row.payrollRunId]">View</a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+</section>

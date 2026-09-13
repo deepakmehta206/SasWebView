@@ -1,0 +1,50 @@
+<section class="page">
+  <app-page-header [title]="(isEdit() ? 'Edit' : 'Add') + ' shift'">
+    <a class="btn btn--secondary" routerLink="/hrms/shifts">Back</a>
+  </app-page-header>
+  <app-ui-card title="Details">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else {
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+        <label class="form-field">
+          <span class="form-label">Branch</span>
+          <select class="form-input" formControlName="branchId">
+            <option [ngValue]="0" disabled>Select branch</option>
+            @for (branch of branches(); track branch.branchId) {
+              <option [ngValue]="branch.branchId">{{ branch.branchCode }} — {{ branch.branchName }}</option>
+            }
+          </select>
+        </label>
+        <label class="form-field"><span class="form-label">Code</span><input class="form-input" formControlName="shiftCode" /></label>
+        <label class="form-field"><span class="form-label">Name</span><input class="form-input" formControlName="shiftName" /></label>
+        <label class="form-field">
+          <span class="form-label">Start (HH:mm:ss)</span>
+          <input class="form-input" formControlName="startTime" placeholder="09:00:00" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">End (HH:mm:ss)</span>
+          <input class="form-input" formControlName="endTime" placeholder="18:00:00" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Break minutes</span>
+          <input class="form-input" type="number" formControlName="breakMinutes" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Grace in minutes</span>
+          <input class="form-input" type="number" formControlName="graceInMinutes" />
+        </label>
+        <label class="form-check"><input type="checkbox" formControlName="isNightShift" /><span>Night shift</span></label>
+        @if (isEdit()) {
+          <label class="form-check"><input type="checkbox" formControlName="isActive" /><span>Active</span></label>
+        }
+        <div class="form-actions">
+          <button class="btn btn--primary" type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Save' }}</button>
+        </div>
+      </form>
+    }
+  </app-ui-card>
+</section>

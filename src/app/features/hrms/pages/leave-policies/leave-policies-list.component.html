@@ -1,0 +1,48 @@
+<section class="page">
+  <app-page-header title="Leave policies">
+    <ng-container *appHasPermission="permissionCodes.LeaveApply">
+      <a class="btn btn--primary" routerLink="new">Add</a>
+    </ng-container>
+  </app-page-header>
+  <app-ui-card title="Leave policies">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else if (!rows().length) {
+      <app-empty-state title="No leave policies" message="Nothing found.">
+        <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+      </app-empty-state>
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Leave type</th>
+              <th>Accrual</th>
+              <th>Active</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.leavePolicyId) {
+              <tr>
+                <td>{{ row.policyName }}</td>
+                <td>{{ row.leaveTypeId }}</td>
+                <td>{{ row.accrualType }} / {{ row.accrualValue }}</td>
+                <td>{{ row.isActive ? 'Yes' : 'No' }}</td>
+                <td>
+                  <ng-container *appHasPermission="permissionCodes.LeaveApply">
+                    <a class="btn btn--secondary" [routerLink]="[row.leavePolicyId, 'edit']">Edit</a>
+                  </ng-container>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+</section>

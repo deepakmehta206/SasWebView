@@ -1,0 +1,44 @@
+<section class="page">
+  <app-page-header title="Leave request">
+    <a class="btn btn--secondary" routerLink="/hrms/leave/requests">Back</a>
+  </app-page-header>
+  @if (errorMessage()) {
+    <div class="alert alert--danger">{{ errorMessage() }}</div>
+  }
+  @if (loading()) {
+    <app-loading-indicator label="Loading…" />
+  } @else {
+    @if (row(); as item) {
+      <app-ui-card title="Details">
+        <dl class="detail-list">
+          <div><dt>Employee</dt><dd>{{ item.employeeId }}</dd></div>
+          <div><dt>Leave type</dt><dd>{{ item.leaveTypeId }}</dd></div>
+          <div><dt>From</dt><dd>{{ item.fromDate }}</dd></div>
+          <div><dt>To</dt><dd>{{ item.toDate }}</dd></div>
+          <div><dt>Days</dt><dd>{{ item.totalDays }}</dd></div>
+          <div><dt>Status</dt><dd>{{ item.status }}</dd></div>
+          <div><dt>Reason</dt><dd>{{ item.reason || '—' }}</dd></div>
+          <div><dt>Rejected reason</dt><dd>{{ item.rejectedReason || '—' }}</dd></div>
+        </dl>
+      </app-ui-card>
+      <app-ui-card title="Actions">
+        <form class="form-grid" [formGroup]="actionForm">
+          <label class="form-field"><span class="form-label">Comments</span><input class="form-input" formControlName="comments" /></label>
+          <label class="form-field"><span class="form-label">Rejected reason</span><input class="form-input" formControlName="rejectedReason" /></label>
+          <label class="form-field"><span class="form-label">Approval level</span><input class="form-input" type="number" formControlName="approvalLevel" /></label>
+        </form>
+        <div class="form-actions">
+          <ng-container *appHasPermission="permissionCodes.LeaveApprove">
+            <button type="button" class="btn btn--primary" [disabled]="acting()" (click)="approve()">Approve</button>
+          </ng-container>
+          <ng-container *appHasPermission="permissionCodes.LeaveReject">
+            <button type="button" class="btn btn--secondary" [disabled]="acting()" (click)="reject()">Reject</button>
+          </ng-container>
+          <ng-container *appHasPermission="permissionCodes.LeaveApply">
+            <button type="button" class="btn btn--secondary" [disabled]="acting()" (click)="cancel()">Cancel</button>
+          </ng-container>
+        </div>
+      </app-ui-card>
+    }
+  }
+</section>

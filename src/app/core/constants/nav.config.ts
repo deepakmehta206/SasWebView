@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { PermissionCodes } from './permission-codes';
+import { FeatureCodes, ModuleCodes } from './feature-codes';
 import { PermissionService } from '../permissions/permission.service';
 import { FeatureAccessService } from '../entitlements/feature-access.service';
 
@@ -72,11 +73,152 @@ export const SIDEBAR_NAV_ITEMS: readonly NavItem[] = [
     anyPermissions: [PermissionCodes.SubscriptionView]
   },
   {
+    label: 'Masters',
+    route: '/masters',
+    icon: 'masters',
+    enabled: true,
+    anyPermissions: [PermissionCodes.MasterView],
+    children: [
+      {
+        label: 'Countries',
+        route: '/masters/countries',
+        enabled: true,
+        anyPermissions: [PermissionCodes.MasterView]
+      },
+      {
+        label: 'States',
+        route: '/masters/states',
+        enabled: true,
+        anyPermissions: [PermissionCodes.MasterView]
+      },
+      {
+        label: 'Cities',
+        route: '/masters/cities',
+        enabled: true,
+        anyPermissions: [PermissionCodes.MasterView]
+      },
+      {
+        label: 'Currencies',
+        route: '/masters/currencies',
+        enabled: true,
+        anyPermissions: [PermissionCodes.MasterView]
+      },
+      {
+        label: 'Payment modes',
+        route: '/masters/payment-modes',
+        enabled: true,
+        anyPermissions: [PermissionCodes.MasterView]
+      },
+      {
+        label: 'Document types',
+        route: '/masters/document-types',
+        enabled: true,
+        anyPermissions: [PermissionCodes.MasterView]
+      },
+      {
+        label: 'Units of measure',
+        route: '/masters/units-of-measure',
+        enabled: true,
+        anyPermissions: [PermissionCodes.MasterView]
+      }
+    ]
+  },
+  {
     label: 'HRMS',
     route: '/hrms',
     icon: 'hrms',
-    enabled: false,
-    moduleCode: 'HRMS'
+    enabled: true,
+    moduleCode: ModuleCodes.Hrms,
+    children: [
+      {
+        label: 'Employees',
+        route: '/hrms/employees',
+        enabled: true,
+        moduleCode: ModuleCodes.Hrms,
+        featureCode: FeatureCodes.HrmsEmployee,
+        anyPermissions: [PermissionCodes.EmployeeView]
+      },
+      {
+        label: 'Departments',
+        route: '/hrms/departments',
+        enabled: true,
+        moduleCode: ModuleCodes.Hrms,
+        featureCode: FeatureCodes.HrmsEmployee,
+        anyPermissions: [PermissionCodes.EmployeeView]
+      },
+      {
+        label: 'Designations',
+        route: '/hrms/designations',
+        enabled: true,
+        moduleCode: ModuleCodes.Hrms,
+        featureCode: FeatureCodes.HrmsEmployee,
+        anyPermissions: [PermissionCodes.EmployeeView]
+      },
+      {
+        label: 'Employee Types',
+        route: '/hrms/employee-types',
+        enabled: true,
+        moduleCode: ModuleCodes.Hrms,
+        featureCode: FeatureCodes.HrmsEmployee,
+        anyPermissions: [PermissionCodes.EmployeeView]
+      },
+      {
+        label: 'Shifts',
+        route: '/hrms/shifts',
+        enabled: true,
+        moduleCode: ModuleCodes.Hrms,
+        featureCode: FeatureCodes.HrmsShift,
+        anyPermissions: [PermissionCodes.AttendanceView]
+      },
+      {
+        label: 'Holidays',
+        route: '/hrms/holidays',
+        enabled: true,
+        moduleCode: ModuleCodes.Hrms,
+        featureCode: FeatureCodes.HrmsAttendance,
+        anyPermissions: [PermissionCodes.AttendanceView]
+      },
+      {
+        label: 'Attendance',
+        route: '/hrms/attendance',
+        enabled: true,
+        moduleCode: ModuleCodes.Hrms,
+        featureCode: FeatureCodes.HrmsAttendance,
+        anyPermissions: [PermissionCodes.AttendanceView]
+      },
+      {
+        label: 'Overtime',
+        route: '/hrms/overtime',
+        enabled: true,
+        moduleCode: ModuleCodes.Hrms,
+        featureCode: FeatureCodes.HrmsOvertime,
+        anyPermissions: [PermissionCodes.AttendanceView]
+      },
+      {
+        label: 'Leave',
+        route: '/hrms/leave',
+        enabled: true,
+        moduleCode: ModuleCodes.Hrms,
+        featureCode: FeatureCodes.HrmsLeave,
+        anyPermissions: [PermissionCodes.LeaveView]
+      },
+      {
+        label: 'Salary',
+        route: '/hrms/salary',
+        enabled: true,
+        moduleCode: ModuleCodes.Hrms,
+        featureCode: FeatureCodes.HrmsPayroll,
+        anyPermissions: [PermissionCodes.PayrollView]
+      },
+      {
+        label: 'Payroll',
+        route: '/hrms/payroll',
+        enabled: true,
+        moduleCode: ModuleCodes.Hrms,
+        featureCode: FeatureCodes.HrmsPayroll,
+        anyPermissions: [PermissionCodes.PayrollView, PermissionCodes.PayslipView]
+      }
+    ]
   },
   {
     label: 'Inventory',
@@ -132,9 +274,9 @@ export class NavigationService {
    * - moduleCode / featureCode must pass (even for Soon items)
    * - enabled === false → show as Soon (caller renders badge)
    * - enabled === true → permission check → visible
+   * - parents with children are hidden when no children remain
    */
   getVisibleNavItems(source: readonly NavItem[] = SIDEBAR_NAV_ITEMS): NavItem[] {
-    // Track signal dependencies for sidebar computed().
     this.permissions.permissions();
     this.featureAccess.modules();
 
@@ -143,19 +285,12 @@ export class NavigationService {
       .filter((item): item is NavItem => item != null);
   }
 
-  /**
-   * Route prefixes that belong to a module (for disable redirect).
-   */
   getRoutePrefixesForModule(moduleCode: string): string[] {
-    return SIDEBAR_NAV_ITEMS.filter(
-      (item) => item.moduleCode === moduleCode && !!item.route
-    ).map((item) => item.route!);
+    return this.collectRoutes(SIDEBAR_NAV_ITEMS, (item) => item.moduleCode === moduleCode);
   }
 
   getRoutePrefixesForFeature(featureCode: string): string[] {
-    return SIDEBAR_NAV_ITEMS.filter(
-      (item) => item.featureCode === featureCode && !!item.route
-    ).map((item) => item.route!);
+    return this.collectRoutes(SIDEBAR_NAV_ITEMS, (item) => item.featureCode === featureCode);
   }
 
   private filterItem(item: NavItem): NavItem | null {
@@ -167,7 +302,6 @@ export class NavigationService {
       return null;
     }
 
-    // Soon placeholder — visible only if module/feature gates passed.
     if (!item.enabled) {
       return item;
     }
@@ -180,9 +314,30 @@ export class NavigationService {
       const children = item.children
         .map((child) => this.filterItem(child))
         .filter((child): child is NavItem => child != null);
+
+      if (children.length === 0) {
+        return null;
+      }
+
       return { ...item, children };
     }
 
     return item;
+  }
+
+  private collectRoutes(
+    items: readonly NavItem[],
+    predicate: (item: NavItem) => boolean
+  ): string[] {
+    const routes: string[] = [];
+    for (const item of items) {
+      if (predicate(item) && item.route) {
+        routes.push(item.route);
+      }
+      if (item.children?.length) {
+        routes.push(...this.collectRoutes(item.children, predicate));
+      }
+    }
+    return routes;
   }
 }

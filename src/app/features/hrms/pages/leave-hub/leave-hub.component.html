@@ -1,0 +1,10 @@
+<section class="hub">
+  <app-page-header title="Leave" subtitle="Leave types, policies, and requests." />
+  <div class="hub__grid">
+    @for (link of links; track link.route) {
+      <a class="hub__link" [routerLink]="link.route">
+        <app-ui-card [title]="link.title"><p>{{ link.description }}</p></app-ui-card>
+      </a>
+    }
+  </div>
+</section>

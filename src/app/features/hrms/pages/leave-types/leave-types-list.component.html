@@ -1,0 +1,50 @@
+<section class="page">
+  <app-page-header title="Leave types">
+    <ng-container *appHasPermission="permissionCodes.LeaveApply">
+      <a class="btn btn--primary" routerLink="new">Add</a>
+    </ng-container>
+  </app-page-header>
+  <app-ui-card title="Leave types">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else if (!rows().length) {
+      <app-empty-state title="No leave types" message="Nothing found.">
+        <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+      </app-empty-state>
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Paid</th>
+              <th>Quota</th>
+              <th>Active</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.leaveTypeId) {
+              <tr>
+                <td>{{ row.leaveCode }}</td>
+                <td>{{ row.leaveName }}</td>
+                <td>{{ row.paidLeave ? 'Yes' : 'No' }}</td>
+                <td>{{ row.annualQuota }}</td>
+                <td>{{ row.isActive ? 'Yes' : 'No' }}</td>
+                <td>
+                  <ng-container *appHasPermission="permissionCodes.LeaveApply">
+                    <a class="btn btn--secondary" [routerLink]="[row.leaveTypeId, 'edit']">Edit</a>
+                  </ng-container>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+</section>

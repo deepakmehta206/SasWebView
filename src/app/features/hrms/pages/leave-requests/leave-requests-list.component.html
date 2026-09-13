@@ -1,0 +1,50 @@
+<section class="page">
+  <app-page-header title="Leave requests">
+    <ng-container *appHasPermission="permissionCodes.LeaveApply">
+      <a class="btn btn--primary" routerLink="new">Apply</a>
+    </ng-container>
+  </app-page-header>
+  <app-ui-card title="Leave requests">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else if (!rows().length) {
+      <app-empty-state title="No leave requests" message="Nothing found.">
+        <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+      </app-empty-state>
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Type</th>
+              <th>From</th>
+              <th>To</th>
+              <th>Days</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.leaveRequestId) {
+              <tr>
+                <td>{{ row.employeeId }}</td>
+                <td>{{ row.leaveTypeId }}</td>
+                <td>{{ row.fromDate }}</td>
+                <td>{{ row.toDate }}</td>
+                <td>{{ row.totalDays }}</td>
+                <td>{{ row.status }}</td>
+                <td>
+                  <a class="btn btn--secondary" [routerLink]="[row.leaveRequestId]">View</a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+</section>

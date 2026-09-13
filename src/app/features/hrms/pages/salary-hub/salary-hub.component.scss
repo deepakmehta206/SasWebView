@@ -1,0 +1,5 @@
+.hub { display:flex; flex-direction:column; gap:1.25rem; }
+.hub__grid { display:grid; gap:1rem; }
+.hub__link { text-decoration:none; color:inherit; border-radius:var(--radius-md); }
+.hub__link p { margin:0; color:var(--color-text-muted); }
+@media (min-width:800px){ .hub__grid { grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); } }

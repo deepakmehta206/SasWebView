@@ -1,0 +1,43 @@
+<section class="page">
+  <app-page-header title="Assign employee salary">
+    <a class="btn btn--secondary" routerLink="/hrms/salary/employee-salaries">Back</a>
+  </app-page-header>
+  <app-ui-card title="Assignment">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+      <label class="form-field">
+        <span class="form-label">Employee</span>
+        <select class="form-input" formControlName="employeeId">
+          <option [ngValue]="0" disabled>Select</option>
+          @for (employee of employees(); track employee.employeeId) {
+            <option [ngValue]="employee.employeeId">
+              {{ employee.employeeCode }} — {{ employee.firstName }} {{ employee.lastName }}
+            </option>
+          }
+        </select>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Salary structure</span>
+        <select class="form-input" formControlName="salaryStructureId">
+          <option [ngValue]="0" disabled>Select</option>
+          @for (structure of structures(); track structure.salaryStructureId) {
+            <option [ngValue]="structure.salaryStructureId">
+              {{ structure.structureCode }} — {{ structure.structureName }}
+            </option>
+          }
+        </select>
+      </label>
+      <label class="form-field"><span class="form-label">Effective from</span><input class="form-input" type="date" formControlName="effectiveFrom" /></label>
+      <label class="form-field"><span class="form-label">Effective to</span><input class="form-input" type="date" formControlName="effectiveTo" /></label>
+      <label class="form-field"><span class="form-label">Basic salary</span><input class="form-input" type="number" formControlName="basicSalary" /></label>
+      <label class="form-field"><span class="form-label">Gross salary</span><input class="form-input" type="number" formControlName="grossSalary" /></label>
+      <label class="form-field"><span class="form-label">CTC</span><input class="form-input" type="number" formControlName="ctc" /></label>
+      <label class="form-field"><span class="form-label">Status</span><input class="form-input" formControlName="status" /></label>
+      <div class="form-actions">
+        <button class="btn btn--primary" type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Save' }}</button>
+      </div>
+    </form>
+  </app-ui-card>
+</section>

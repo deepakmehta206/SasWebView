@@ -1,0 +1,140 @@
+<section class="page">
+  <app-page-header title="Employee details">
+    <a class="btn btn--secondary" routerLink="/hrms/employees">Back</a>
+    <ng-container *appHasPermission="permissionCodes.EmployeeEdit">
+      @if (employee(); as empLink) {
+        <a class="btn btn--secondary" [routerLink]="['/hrms/employees', empLink.employeeId, 'edit']">Edit</a>
+      }
+    </ng-container>
+  </app-page-header>
+
+  @if (errorMessage()) {
+    <div class="alert alert--danger">{{ errorMessage() }}</div>
+  }
+
+  @if (loading()) {
+    <app-loading-indicator label="Loading…" />
+  } @else {
+    @if (employee(); as emp) {
+      <app-ui-card title="Core">
+        <dl class="detail-list">
+          <div><dt>Code</dt><dd>{{ emp.employeeCode }}</dd></div>
+          <div><dt>Name</dt><dd>{{ emp.firstName }} {{ emp.middleName }} {{ emp.lastName }}</dd></div>
+          <div><dt>Branch</dt><dd>{{ emp.branchId }}</dd></div>
+          <div><dt>Email</dt><dd>{{ emp.email || '—' }}</dd></div>
+          <div><dt>Phone</dt><dd>{{ emp.phone || '—' }}</dd></div>
+          <div><dt>Joined</dt><dd>{{ emp.dateOfJoining }}</dd></div>
+          <div><dt>Department</dt><dd>{{ emp.departmentId || '—' }}</dd></div>
+          <div><dt>Designation</dt><dd>{{ emp.designationId || '—' }}</dd></div>
+          <div><dt>Type</dt><dd>{{ emp.employeeTypeId || '—' }}</dd></div>
+          <div><dt>Status</dt><dd>{{ emp.status }}</dd></div>
+          <div><dt>Active</dt><dd>{{ emp.isActive ? 'Yes' : 'No' }}</dd></div>
+        </dl>
+      </app-ui-card>
+
+      <app-ui-card title="Profile">
+        <form class="form-grid" [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+          <label class="form-field"><span class="form-label">Father name</span><input class="form-input" formControlName="fatherName" /></label>
+          <label class="form-field"><span class="form-label">Mother name</span><input class="form-input" formControlName="motherName" /></label>
+          <label class="form-field form-field--full"><span class="form-label">Address</span><input class="form-input" formControlName="address" /></label>
+          <label class="form-field"><span class="form-label">City ID</span><input class="form-input" type="number" formControlName="cityId" /></label>
+          <label class="form-field"><span class="form-label">State ID</span><input class="form-input" type="number" formControlName="stateId" /></label>
+          <label class="form-field"><span class="form-label">Country ID</span><input class="form-input" type="number" formControlName="countryId" /></label>
+          <label class="form-field"><span class="form-label">Postal code</span><input class="form-input" formControlName="postalCode" /></label>
+          <label class="form-field"><span class="form-label">Emergency contact</span><input class="form-input" formControlName="emergencyContactName" /></label>
+          <label class="form-field"><span class="form-label">Emergency phone</span><input class="form-input" formControlName="emergencyContactPhone" /></label>
+          <label class="form-field"><span class="form-label">Blood group</span><input class="form-input" formControlName="bloodGroup" /></label>
+          <label class="form-field"><span class="form-label">Marital status</span><input class="form-input" formControlName="maritalStatus" /></label>
+
+          @if (canViewSensitive) {
+            <h3 class="section-title form-field--full">Sensitive</h3>
+            @if (sensitiveError()) {
+              <div class="alert alert--info form-field--full">{{ sensitiveError() }}</div>
+            }
+            <label class="form-field"><span class="form-label">Bank account</span><input class="form-input" formControlName="bankAccountNumber" /></label>
+            <label class="form-field"><span class="form-label">Bank name</span><input class="form-input" formControlName="bankName" /></label>
+            <label class="form-field"><span class="form-label">IFSC</span><input class="form-input" formControlName="ifscCode" /></label>
+            <label class="form-field"><span class="form-label">PAN</span><input class="form-input" formControlName="pan" /></label>
+            <label class="form-field"><span class="form-label">Aadhaar last 4</span><input class="form-input" formControlName="aadhaarLast4" /></label>
+          }
+
+          <div class="form-actions form-field--full">
+            <ng-container *appHasPermission="permissionCodes.EmployeeEdit">
+              <button class="btn btn--primary" type="submit" [disabled]="savingProfile()">
+                {{ savingProfile() ? 'Saving…' : 'Save profile' }}
+              </button>
+            </ng-container>
+          </div>
+        </form>
+      </app-ui-card>
+
+      <app-ui-card title="Documents">
+        @if (!documents().length) {
+          <app-empty-state title="No documents" message="No employee documents yet." />
+        } @else {
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Number</th>
+                  <th>File ID</th>
+                  <th>Issue</th>
+                  <th>Expiry</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (doc of documents(); track doc.employeeDocumentId) {
+                  <tr>
+                    <td>{{ doc.documentTypeId }}</td>
+                    <td>{{ doc.documentNumber || '—' }}</td>
+                    <td>{{ doc.fileId || '—' }}</td>
+                    <td>{{ doc.issueDate || '—' }}</td>
+                    <td>{{ doc.expiryDate || '—' }}</td>
+                    <td>{{ doc.status }}</td>
+                    <td>
+                      <ng-container *appHasPermission="permissionCodes.EmployeeEdit">
+                        <button type="button" class="btn btn--secondary" (click)="deleteDocument(doc.employeeDocumentId)">
+                          Delete
+                        </button>
+                      </ng-container>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        <ng-container *appHasPermission="permissionCodes.EmployeeEdit">
+          <h3 class="section-title">Add document</h3>
+          <form class="form-grid" [formGroup]="documentForm" (ngSubmit)="addDocument()">
+            <label class="form-field">
+              <span class="form-label">Document type</span>
+              <select class="form-input" formControlName="documentTypeId">
+                <option [ngValue]="0" disabled>Select</option>
+                @for (dt of documentTypes(); track dt.documentTypeId) {
+                  <option [ngValue]="dt.documentTypeId">
+                    {{ dt.documentTypeCode }} — {{ dt.documentTypeName }}
+                  </option>
+                }
+              </select>
+            </label>
+            <label class="form-field"><span class="form-label">Document number</span><input class="form-input" formControlName="documentNumber" /></label>
+            <label class="form-field"><span class="form-label">File ID</span><input class="form-input" type="number" formControlName="fileId" /></label>
+            <label class="form-field"><span class="form-label">Issue date</span><input class="form-input" type="date" formControlName="issueDate" /></label>
+            <label class="form-field"><span class="form-label">Expiry date</span><input class="form-input" type="date" formControlName="expiryDate" /></label>
+            <label class="form-field"><span class="form-label">Status</span><input class="form-input" formControlName="status" /></label>
+            <div class="form-actions">
+              <button class="btn btn--primary" type="submit" [disabled]="savingDocument()">
+                {{ savingDocument() ? 'Saving…' : 'Add document' }}
+              </button>
+            </div>
+          </form>
+        </ng-container>
+      </app-ui-card>
+    }
+  }
+</section>

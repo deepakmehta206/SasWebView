@@ -35,7 +35,31 @@ export const PermissionCodes = {
   PlanManage: 'PLAN_MANAGE',
 
   SubscriptionView: 'SUBSCRIPTION_VIEW',
-  SubscriptionManage: 'SUBSCRIPTION_MANAGE'
+  SubscriptionManage: 'SUBSCRIPTION_MANAGE',
+
+  MasterView: 'MASTER_VIEW',
+  MasterEdit: 'MASTER_EDIT',
+
+  EmployeeView: 'EMPLOYEE_VIEW',
+  EmployeeAdd: 'EMPLOYEE_ADD',
+  EmployeeEdit: 'EMPLOYEE_EDIT',
+  EmployeeDelete: 'EMPLOYEE_DELETE',
+  EmployeeProfileSensitive: 'EMPLOYEE_PROFILE_SENSITIVE',
+
+  AttendanceView: 'ATTENDANCE_VIEW',
+  AttendanceAdd: 'ATTENDANCE_ADD',
+  AttendanceEdit: 'ATTENDANCE_EDIT',
+
+  LeaveView: 'LEAVE_VIEW',
+  LeaveApply: 'LEAVE_APPLY',
+  LeaveApprove: 'LEAVE_APPROVE',
+  LeaveReject: 'LEAVE_REJECT',
+
+  PayrollView: 'PAYROLL_VIEW',
+  PayrollProcess: 'PAYROLL_PROCESS',
+  PayrollApprove: 'PAYROLL_APPROVE',
+  PayrollLock: 'PAYROLL_LOCK',
+  PayslipView: 'PAYSLIP_VIEW'
 } as const;
 
 export type PermissionCode = (typeof PermissionCodes)[keyof typeof PermissionCodes];

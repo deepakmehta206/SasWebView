@@ -63,6 +63,65 @@
   gap: 0.25rem;
 }
 
+.sidebar__row {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.sidebar__row .sidebar__link {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar__toggle {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-sidebar-muted);
+  cursor: pointer;
+  padding: 0;
+}
+
+.sidebar__toggle:hover,
+.sidebar__toggle:focus-visible {
+  background: var(--color-sidebar-hover);
+  color: var(--color-sidebar-text);
+  outline: none;
+}
+
+.sidebar__chevron {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+  margin-top: -0.1rem;
+}
+
+.sidebar__item--expanded .sidebar__chevron {
+  transform: rotate(45deg);
+  margin-top: 0;
+}
+
+.sidebar__children {
+  list-style: none;
+  margin: 0.15rem 0 0.45rem;
+  padding: 0 0 0 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  border-left: 1px solid var(--color-sidebar-border);
+  margin-left: 0.85rem;
+}
+
 .sidebar__link {
   display: flex;
   align-items: center;
@@ -81,9 +140,30 @@
   outline: none;
 }
 
+/* Parent active — dark-sidebar friendly (avoid light soft bg + washed text). */
 .sidebar__link--active {
-  background: var(--color-primary-soft);
-  color: var(--color-primary);
+  background: rgba(94, 234, 212, 0.14);
+  color: #5eead4;
+}
+
+.sidebar__link--child {
+  padding: 0.45rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 450;
+  color: var(--color-sidebar-muted);
+}
+
+.sidebar__link--child:hover,
+.sidebar__link--child:focus-visible {
+  color: var(--color-sidebar-text);
+  background: var(--color-sidebar-hover);
+}
+
+/* Dedicated child active class so parent active styles do not fight specificity. */
+.sidebar__link--child-active {
+  background: rgba(94, 234, 212, 0.18);
+  color: #5eead4;
+  font-weight: 600;
 }
 
 .sidebar__link--disabled {
@@ -98,6 +178,12 @@
   background: currentColor;
   opacity: 0.55;
   flex-shrink: 0;
+}
+
+.sidebar__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sidebar__badge {

@@ -1,0 +1,94 @@
+<section class="page">
+  <app-page-header title="Overtime" />
+
+  @if (errorMessage()) {
+    <div class="alert alert--danger">{{ errorMessage() }}</div>
+  }
+
+  <app-ui-card title="Overtime">
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else if (!rows().length) {
+      <app-empty-state title="No overtime" message="Nothing found.">
+        <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+      </app-empty-state>
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Employee</th>
+              <th>Minutes</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.overtimeId) {
+              <tr>
+                <td>{{ row.overtimeDate }}</td>
+                <td>{{ row.employeeId }}</td>
+                <td>{{ row.minutes }}</td>
+                <td>{{ row.amount }}</td>
+                <td>{{ row.status }}</td>
+                <td>
+                  @if (row.status === 'PENDING') {
+                    <ng-container *appHasPermission="permissionCodes.AttendanceEdit">
+                      <button
+                        type="button"
+                        class="btn btn--primary"
+                        [disabled]="approvingId() === row.overtimeId"
+                        (click)="approve(row)"
+                      >
+                        Approve
+                      </button>
+                    </ng-container>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+
+  <ng-container *appHasPermission="permissionCodes.AttendanceAdd">
+    <app-ui-card title="Create overtime">
+      <form class="form-grid" [formGroup]="createForm" (ngSubmit)="save()">
+        <label class="form-field">
+          <span class="form-label">Branch</span>
+          <select class="form-input" formControlName="branchId">
+            <option [ngValue]="0" disabled>Select</option>
+            @for (branch of branches(); track branch.branchId) {
+              <option [ngValue]="branch.branchId">{{ branch.branchCode }} — {{ branch.branchName }}</option>
+            }
+          </select>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Employee</span>
+          <select class="form-input" formControlName="employeeId">
+            <option [ngValue]="0" disabled>Select</option>
+            @for (employee of employees(); track employee.employeeId) {
+              <option [ngValue]="employee.employeeId">
+                {{ employee.employeeCode }} — {{ employee.firstName }} {{ employee.lastName }}
+              </option>
+            }
+          </select>
+        </label>
+        <label class="form-field"><span class="form-label">Attendance ID</span><input class="form-input" type="number" formControlName="attendanceId" /></label>
+        <label class="form-field"><span class="form-label">Date</span><input class="form-input" type="date" formControlName="overtimeDate" /></label>
+        <label class="form-field"><span class="form-label">Start</span><input class="form-input" type="datetime-local" formControlName="startTime" /></label>
+        <label class="form-field"><span class="form-label">End</span><input class="form-input" type="datetime-local" formControlName="endTime" /></label>
+        <label class="form-field"><span class="form-label">Minutes</span><input class="form-input" type="number" formControlName="minutes" /></label>
+        <label class="form-field"><span class="form-label">Rate</span><input class="form-input" type="number" formControlName="rate" /></label>
+        <label class="form-field"><span class="form-label">Amount</span><input class="form-input" type="number" formControlName="amount" /></label>
+        <div class="form-actions">
+          <button class="btn btn--primary" type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Create' }}</button>
+        </div>
+      </form>
+    </app-ui-card>
+  </ng-container>
+</section>

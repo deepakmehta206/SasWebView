@@ -1,0 +1,26 @@
+<section class="page">
+  <app-page-header title="Create payroll run">
+    <a class="btn btn--secondary" routerLink="/hrms/payroll/runs">Back</a>
+  </app-page-header>
+  <app-ui-card title="Payroll run">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+      <label class="form-field">
+        <span class="form-label">Branch</span>
+        <select class="form-input" formControlName="branchId">
+          <option [ngValue]="0" disabled>Select</option>
+          @for (branch of branches(); track branch.branchId) {
+            <option [ngValue]="branch.branchId">{{ branch.branchCode }} — {{ branch.branchName }}</option>
+          }
+        </select>
+      </label>
+      <label class="form-field"><span class="form-label">Month</span><input class="form-input" type="number" formControlName="payrollMonth" min="1" max="12" /></label>
+      <label class="form-field"><span class="form-label">Year</span><input class="form-input" type="number" formControlName="payrollYear" /></label>
+      <div class="form-actions">
+        <button class="btn btn--primary" type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Create' }}</button>
+      </div>
+    </form>
+  </app-ui-card>
+</section>

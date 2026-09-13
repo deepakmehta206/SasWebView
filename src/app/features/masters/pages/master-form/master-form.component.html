@@ -1,0 +1,66 @@
+@if (definition(); as def) {
+  <section class="master-form">
+    <app-page-header
+      [title]="(isEdit() ? 'Edit ' : 'Add ') + def.singular"
+      [subtitle]="def.title"
+    >
+      <a class="btn btn--secondary" [routerLink]="['/masters', def.key]">Back</a>
+    </app-page-header>
+
+    <app-ui-card [title]="def.singular">
+      @if (errorMessage()) {
+        <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+      }
+      @if (fieldErrors().length) {
+        <ul class="alert alert--danger alert--list" role="alert">
+          @for (err of fieldErrors(); track err) {
+            <li>{{ err }}</li>
+          }
+        </ul>
+      }
+
+      @if (loading()) {
+        <app-loading-indicator label="Loading…" />
+      } @else {
+        <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+          @for (field of visibleFields(def, isEdit()); track field.key) {
+            <label class="form-field" [class.form-check]="field.type === 'checkbox'">
+              @if (field.type !== 'checkbox') {
+                <span class="form-label">{{ field.label }}</span>
+              }
+
+              @if (field.type === 'text') {
+                <input class="form-input" type="text" [formControlName]="field.key" />
+              } @else if (field.type === 'number') {
+                <input
+                  class="form-input"
+                  type="number"
+                  [formControlName]="field.key"
+                  [attr.min]="field.min ?? null"
+                  [attr.step]="field.step ?? null"
+                />
+              } @else if (field.type === 'select') {
+                <select class="form-input" [formControlName]="field.key">
+                  <option value="">Select…</option>
+                  @for (opt of selectOptions()[field.key] ?? field.options ?? []; track opt.value) {
+                    <option [value]="opt.value">{{ opt.label }}</option>
+                  }
+                </select>
+              } @else if (field.type === 'checkbox') {
+                <input type="checkbox" [formControlName]="field.key" />
+                <span>{{ field.label }}</span>
+              }
+            </label>
+          }
+
+          <div class="form-actions">
+            <button class="btn btn--primary" type="submit" [disabled]="saving()">
+              {{ saving() ? 'Saving…' : 'Save' }}
+            </button>
+            <a class="btn btn--secondary" [routerLink]="['/masters', def.key]">Cancel</a>
+          </div>
+        </form>
+      }
+    </app-ui-card>
+  </section>
+}

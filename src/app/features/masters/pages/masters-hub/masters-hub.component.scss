@@ -1,0 +1,32 @@
+.masters-hub {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.masters-hub__grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.masters-hub__link {
+  text-decoration: none;
+  color: inherit;
+  border-radius: var(--radius-md);
+}
+
+.masters-hub__link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.masters-hub__link p {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+@media (min-width: 800px) {
+  .masters-hub__grid {
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  }
+}

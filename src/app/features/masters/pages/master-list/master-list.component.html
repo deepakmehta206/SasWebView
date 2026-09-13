@@ -1,0 +1,80 @@
+@if (definition(); as def) {
+  <section class="master-list">
+    <app-page-header [title]="def.title" [subtitle]="def.scope === 'global' ? 'System master' : 'Tenant master'">
+      <ng-container *appHasPermission="permissionCodes.MasterEdit">
+        <a class="btn btn--primary" [routerLink]="['/masters', def.key, 'new']">Add {{ def.singular }}</a>
+      </ng-container>
+    </app-page-header>
+
+    <app-ui-card title="Filters">
+      <form class="master-list__filters" [formGroup]="filterForm" (ngSubmit)="load()">
+        @if (def.listFilters?.[0]; as filter) {
+          <label class="form-field">
+            <span class="form-label">{{ filter.label }}</span>
+            <select class="form-input" formControlName="filterValue">
+              <option value="">All</option>
+              @for (opt of filterOptions()[filter.key] ?? []; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </label>
+        }
+        <label class="form-field">
+          <span class="form-label">Active</span>
+          <select class="form-input" formControlName="isActive">
+            <option value="">All</option>
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+          </select>
+        </label>
+        <button type="submit" class="btn btn--secondary">Apply</button>
+      </form>
+    </app-ui-card>
+
+    <app-ui-card [title]="def.title">
+      @if (errorMessage()) {
+        <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+      }
+
+      @if (loading()) {
+        <app-loading-indicator [label]="'Loading ' + def.title + '…'" />
+      } @else if (rows().length === 0) {
+        <app-empty-state title="No records" message="No master records match the current filters.">
+          <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+        </app-empty-state>
+      } @else {
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                @for (col of def.columns; track col.key) {
+                  <th>{{ col.label }}</th>
+                }
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of rows(); track rowId(row)) {
+                <tr>
+                  @for (col of def.columns; track col.key) {
+                    <td>{{ displayValue(row, col.key) }}</td>
+                  }
+                  <td>
+                    <ng-container *appHasPermission="permissionCodes.MasterEdit">
+                      <a
+                        class="btn btn--secondary"
+                        [routerLink]="['/masters', def.key, rowId(row), 'edit']"
+                      >
+                        Edit
+                      </a>
+                    </ng-container>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </app-ui-card>
+  </section>
+}

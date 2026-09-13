@@ -1,0 +1,40 @@
+<section class="page">
+  <app-page-header [title]="(isEdit() ? 'Edit' : 'Add') + ' salary component'">
+    <a class="btn btn--secondary" routerLink="/hrms/salary/components">Back</a>
+  </app-page-header>
+  <app-ui-card title="Details">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else {
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+        <label class="form-field"><span class="form-label">Code</span><input class="form-input" formControlName="componentCode" /></label>
+        <label class="form-field"><span class="form-label">Name</span><input class="form-input" formControlName="componentName" /></label>
+        <label class="form-field">
+          <span class="form-label">Component type</span>
+          <select class="form-input" formControlName="componentType">
+            <option value="EARNING">EARNING</option>
+            <option value="DEDUCTION">DEDUCTION</option>
+          </select>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Calculation type</span>
+          <select class="form-input" formControlName="calculationType">
+            <option value="FIXED">FIXED</option>
+            <option value="PERCENTAGE">PERCENTAGE</option>
+          </select>
+        </label>
+        <label class="form-check"><input type="checkbox" formControlName="isTaxable" /><span>Taxable</span></label>
+        <label class="form-check"><input type="checkbox" formControlName="isStatutory" /><span>Statutory</span></label>
+        @if (isEdit()) {
+          <label class="form-check"><input type="checkbox" formControlName="isActive" /><span>Active</span></label>
+        }
+        <div class="form-actions">
+          <button class="btn btn--primary" type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Save' }}</button>
+        </div>
+      </form>
+    }
+  </app-ui-card>
+</section>

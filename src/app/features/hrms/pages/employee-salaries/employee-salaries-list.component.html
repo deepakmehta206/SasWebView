@@ -1,0 +1,50 @@
+<section class="page">
+  <app-page-header title="Employee salaries">
+    <ng-container *appHasPermission="permissionCodes.PayrollProcess">
+      <a class="btn btn--primary" routerLink="new">Assign</a>
+    </ng-container>
+  </app-page-header>
+  <app-ui-card title="Employee salaries">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else if (!rows().length) {
+      <app-empty-state title="No employee salaries" message="Nothing found.">
+        <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+      </app-empty-state>
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Structure</th>
+              <th>From</th>
+              <th>To</th>
+              <th>Basic</th>
+              <th>Gross</th>
+              <th>CTC</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.employeeSalaryId) {
+              <tr>
+                <td>{{ row.employeeId }}</td>
+                <td>{{ row.salaryStructureId }}</td>
+                <td>{{ row.effectiveFrom }}</td>
+                <td>{{ row.effectiveTo || '—' }}</td>
+                <td>{{ row.basicSalary }}</td>
+                <td>{{ row.grossSalary }}</td>
+                <td>{{ row.ctc }}</td>
+                <td>{{ row.status }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+</section>

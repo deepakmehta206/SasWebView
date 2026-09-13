@@ -1,0 +1,43 @@
+<section class="page">
+  <app-page-header [title]="(isEdit() ? 'Edit' : 'Add') + ' leave policy'">
+    <a class="btn btn--secondary" routerLink="/hrms/leave/policies">Back</a>
+  </app-page-header>
+  <app-ui-card title="Details">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else {
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+        <label class="form-field">
+          <span class="form-label">Leave type</span>
+          <select class="form-input" formControlName="leaveTypeId">
+            <option [ngValue]="0" disabled>Select</option>
+            @for (lt of leaveTypes(); track lt.leaveTypeId) {
+              <option [ngValue]="lt.leaveTypeId">{{ lt.leaveCode }} — {{ lt.leaveName }}</option>
+            }
+          </select>
+        </label>
+        <label class="form-field"><span class="form-label">Policy name</span><input class="form-input" formControlName="policyName" /></label>
+        <label class="form-field"><span class="form-label">Accrual type</span><input class="form-input" formControlName="accrualType" /></label>
+        <label class="form-field"><span class="form-label">Accrual value</span><input class="form-input" type="number" formControlName="accrualValue" /></label>
+        <label class="form-field"><span class="form-label">Max carry forward</span><input class="form-input" type="number" formControlName="maxCarryForward" /></label>
+        <label class="form-field">
+          <span class="form-label">Applicable employee type</span>
+          <select class="form-input" formControlName="applicableToEmployeeTypeId">
+            <option [ngValue]="null">All</option>
+            @for (et of employeeTypes(); track et.employeeTypeId) {
+              <option [ngValue]="et.employeeTypeId">{{ et.employeeTypeCode }} — {{ et.employeeTypeName }}</option>
+            }
+          </select>
+        </label>
+        <label class="form-check"><input type="checkbox" formControlName="carryForwardAllowed" /><span>Carry forward allowed</span></label>
+        <label class="form-check"><input type="checkbox" formControlName="isActive" /><span>Active</span></label>
+        <div class="form-actions">
+          <button class="btn btn--primary" type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Save' }}</button>
+        </div>
+      </form>
+    }
+  </app-ui-card>
+</section>

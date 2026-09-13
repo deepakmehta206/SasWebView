@@ -1,0 +1,71 @@
+<section class="page">
+  <app-page-header [title]="(isEdit() ? 'Edit' : 'Add') + ' employee'">
+    <a class="btn btn--secondary" routerLink="/hrms/employees">Back</a>
+  </app-page-header>
+  <app-ui-card title="Employee">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else {
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+        <label class="form-field">
+          <span class="form-label">Branch</span>
+          <select class="form-input" formControlName="branchId">
+            <option [ngValue]="0" disabled>Select</option>
+            @for (branch of branches(); track branch.branchId) {
+              <option [ngValue]="branch.branchId">{{ branch.branchCode }} — {{ branch.branchName }}</option>
+            }
+          </select>
+        </label>
+        <label class="form-field"><span class="form-label">Code</span><input class="form-input" formControlName="employeeCode" /></label>
+        <label class="form-field"><span class="form-label">First name</span><input class="form-input" formControlName="firstName" /></label>
+        <label class="form-field"><span class="form-label">Middle name</span><input class="form-input" formControlName="middleName" /></label>
+        <label class="form-field"><span class="form-label">Last name</span><input class="form-input" formControlName="lastName" /></label>
+        <label class="form-field"><span class="form-label">Email</span><input class="form-input" formControlName="email" /></label>
+        <label class="form-field"><span class="form-label">Phone</span><input class="form-input" formControlName="phone" /></label>
+        <label class="form-field"><span class="form-label">Date of birth</span><input class="form-input" type="date" formControlName="dateOfBirth" /></label>
+        <label class="form-field"><span class="form-label">Date of joining</span><input class="form-input" type="date" formControlName="dateOfJoining" /></label>
+        <label class="form-field"><span class="form-label">Date of leaving</span><input class="form-input" type="date" formControlName="dateOfLeaving" /></label>
+        <label class="form-field"><span class="form-label">Gender</span><input class="form-input" formControlName="gender" /></label>
+        <label class="form-field">
+          <span class="form-label">Department</span>
+          <select class="form-input" formControlName="departmentId">
+            <option [ngValue]="null">None</option>
+            @for (d of departments(); track d.departmentId) {
+              <option [ngValue]="d.departmentId">{{ d.departmentCode }} — {{ d.departmentName }}</option>
+            }
+          </select>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Designation</span>
+          <select class="form-input" formControlName="designationId">
+            <option [ngValue]="null">None</option>
+            @for (d of designations(); track d.designationId) {
+              <option [ngValue]="d.designationId">{{ d.designationCode }} — {{ d.designationName }}</option>
+            }
+          </select>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Employee type</span>
+          <select class="form-input" formControlName="employeeTypeId">
+            <option [ngValue]="null">None</option>
+            @for (t of employeeTypes(); track t.employeeTypeId) {
+              <option [ngValue]="t.employeeTypeId">{{ t.employeeTypeCode }} — {{ t.employeeTypeName }}</option>
+            }
+          </select>
+        </label>
+        <label class="form-field"><span class="form-label">Reporting manager ID</span><input class="form-input" type="number" formControlName="reportingManagerId" /></label>
+        <label class="form-field"><span class="form-label">User ID</span><input class="form-input" type="number" formControlName="userId" /></label>
+        <label class="form-field"><span class="form-label">Status</span><input class="form-input" formControlName="status" /></label>
+        @if (isEdit()) {
+          <label class="form-check"><input type="checkbox" formControlName="isActive" /><span>Active</span></label>
+        }
+        <div class="form-actions">
+          <button class="btn btn--primary" type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Save' }}</button>
+        </div>
+      </form>
+    }
+  </app-ui-card>
+</section>

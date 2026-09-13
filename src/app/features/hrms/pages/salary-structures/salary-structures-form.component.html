@@ -1,0 +1,56 @@
+<section class="page">
+  <app-page-header [title]="(isEdit() ? 'Edit' : 'Add') + ' salary structure'">
+    <a class="btn btn--secondary" routerLink="/hrms/salary/structures">Back</a>
+  </app-page-header>
+  <app-ui-card title="Details">
+    @if (errorMessage()) {
+      <div class="alert alert--danger">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading…" />
+    } @else {
+      <form class="stack" [formGroup]="form" (ngSubmit)="submit()">
+        <div class="form-grid">
+          <label class="form-field"><span class="form-label">Code</span><input class="form-input" formControlName="structureCode" /></label>
+          <label class="form-field"><span class="form-label">Name</span><input class="form-input" formControlName="structureName" /></label>
+          <label class="form-check"><input type="checkbox" formControlName="isActive" /><span>Active</span></label>
+        </div>
+        <div formArrayName="details">
+          <h3 class="section-title">Components</h3>
+          @for (detail of details.controls; track $index; let i = $index) {
+            <div class="form-grid" [formGroupName]="i">
+              <label class="form-field">
+                <span class="form-label">Component</span>
+                <select class="form-input" formControlName="salaryComponentId">
+                  <option [ngValue]="0" disabled>Select</option>
+                  @for (c of components(); track c.salaryComponentId) {
+                    <option [ngValue]="c.salaryComponentId">{{ c.componentCode }} — {{ c.componentName }}</option>
+                  }
+                </select>
+              </label>
+              <label class="form-field">
+                <span class="form-label">Calculation</span>
+                <select class="form-input" formControlName="calculationType">
+                  <option value="FIXED">FIXED</option>
+                  <option value="PERCENTAGE">PERCENTAGE</option>
+                </select>
+              </label>
+              <label class="form-field"><span class="form-label">Amount</span><input class="form-input" type="number" formControlName="amount" /></label>
+              <label class="form-field"><span class="form-label">Percentage</span><input class="form-input" type="number" formControlName="percentage" /></label>
+              <label class="form-field"><span class="form-label">Sequence</span><input class="form-input" type="number" formControlName="sequence" /></label>
+              <div class="form-actions">
+                <button type="button" class="btn btn--secondary" (click)="removeDetail(i)" [disabled]="details.length <= 1">Remove</button>
+              </div>
+            </div>
+          }
+          <div class="form-actions">
+            <button type="button" class="btn btn--secondary" (click)="addDetail()">Add component</button>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn--primary" type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Save' }}</button>
+        </div>
+      </form>
+    }
+  </app-ui-card>
+</section>
