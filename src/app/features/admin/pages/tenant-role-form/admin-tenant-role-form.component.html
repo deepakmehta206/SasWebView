@@ -1,0 +1,59 @@
+<section class="page">
+  <app-page-header
+    [title]="isEdit() ? 'Edit role' : 'Add role'"
+    subtitle="Custom role definition for the selected tenant."
+  >
+    @if (tenantId(); as id) {
+      <a class="btn btn--secondary" [routerLink]="['/admin/tenants', id, 'roles']">Back</a>
+    }
+  </app-page-header>
+  @if (loading()) {
+    <app-loading-indicator label="Loading role…" />
+  } @else if (loadFailed()) {
+    <app-empty-state title="Role unavailable" [message]="errorMessage() || 'Unable to load role.'" />
+  } @else {
+    <app-ui-card title="Role details">
+      @if (locked()) {
+        <div class="alert alert--danger" role="alert">System roles are locked and cannot be edited.</div>
+      }
+      @if (errorMessage()) {
+        <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+      }
+      @if (fieldErrors().length) {
+        <ul class="alert alert--danger alert--list" role="alert">
+          @for (item of fieldErrors(); track item.code + item.message) {
+            <li>{{ item.code }}: {{ item.message }}</li>
+          }
+        </ul>
+      }
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="save()" novalidate>
+        <label class="form-field">
+          <span class="form-label">Role code *</span>
+          <input class="form-input" type="text" formControlName="roleCode" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Role name *</span>
+          <input class="form-input" type="text" formControlName="roleName" />
+        </label>
+        <label class="form-field form-field--full">
+          <span class="form-label">Description</span>
+          <textarea class="form-input" rows="3" formControlName="description"></textarea>
+        </label>
+        @if (isEdit()) {
+          <label class="form-field form-field--check">
+            <span class="form-label">Active</span>
+            <input type="checkbox" formControlName="isActive" />
+          </label>
+        }
+        <div class="form-actions form-field--full">
+          <button type="submit" class="btn btn--primary" [disabled]="saving() || locked()">
+            {{ saving() ? 'Saving…' : 'Save' }}
+          </button>
+          @if (tenantId(); as id) {
+            <a class="btn btn--secondary" [routerLink]="['/admin/tenants', id, 'roles']">Cancel</a>
+          }
+        </div>
+      </form>
+    </app-ui-card>
+  }
+</section>

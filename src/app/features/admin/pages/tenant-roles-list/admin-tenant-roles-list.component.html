@@ -1,0 +1,56 @@
+<section class="page">
+  <app-page-header
+    [title]="tenant() ? ('Roles — ' + tenant()!.tenantName) : 'Roles'"
+    subtitle="Tenant roles. TENANT_ADMIN is visible but locked. PLATFORM_ADMIN is never listed."
+  >
+    @if (tenantId(); as id) {
+      <a class="btn btn--ghost" [routerLink]="['/admin/tenants', id]">Back to tenant</a>
+      <a class="btn btn--primary" [routerLink]="['/admin/tenants', id, 'roles', 'new']">Add role</a>
+    }
+  </app-page-header>
+
+  <app-ui-card title="Role list">
+    <label class="form-field" style="max-width: 20rem; margin-bottom: 1rem">
+      <span class="form-label">Search</span>
+      <input class="form-input" type="search" [formControl]="searchControl" placeholder="Code or name…" />
+    </label>
+    @if (errorMessage()) {
+      <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+    }
+    @if (loading()) {
+      <app-loading-indicator label="Loading roles…" />
+    } @else if (filteredRoles().length === 0) {
+      <app-empty-state title="No roles found" message="Try adjusting search or add a role.">
+        <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+      </app-empty-state>
+    } @else {
+      @if (tenantId(); as id) {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Code</th><th>Name</th><th>Status</th><th>System</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            @for (role of filteredRoles(); track role.roleId) {
+              <tr>
+                <td>{{ role.roleCode }}</td>
+                <td>{{ role.roleName }}</td>
+                <td>{{ role.isActive ? 'Active' : 'Inactive' }}</td>
+                <td>{{ role.isSystemRole ? 'Yes' : 'No' }}</td>
+                <td class="data-table__actions">
+                  @if (isLocked(role)) {
+                    <a class="btn btn--secondary btn--compact" [routerLink]="['/admin/tenants', id, 'roles', role.roleId, 'permissions']">View permissions</a>
+                  } @else {
+                    <a class="btn btn--secondary btn--compact" [routerLink]="['/admin/tenants', id, 'roles', role.roleId, 'edit']">Edit</a>
+                    <a class="btn btn--secondary btn--compact" [routerLink]="['/admin/tenants', id, 'roles', role.roleId, 'permissions']">Permissions</a>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      }
+    }
+  </app-ui-card>
+</section>

@@ -48,6 +48,8 @@
                 <td>{{ formatDate(row.createdDate) }}</td>
                 <td class="data-table__actions">
                   <a class="btn btn--ghost btn--sm" [routerLink]="['/admin/tenants', row.tenantId]">View</a>
+                  <a class="btn btn--ghost btn--sm" [routerLink]="['/admin/tenants', row.tenantId, 'users']">Users</a>
+                  <a class="btn btn--ghost btn--sm" [routerLink]="['/admin/tenants', row.tenantId, 'roles']">Roles</a>
                   <a class="btn btn--ghost btn--sm" [routerLink]="['/admin/tenants', row.tenantId, 'edit']">Edit</a>
                   @if (canActivate(row.status, row.isActive)) {
                     <button

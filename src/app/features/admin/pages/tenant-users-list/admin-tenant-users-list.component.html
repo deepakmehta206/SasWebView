@@ -1,0 +1,87 @@
+<section class="page">
+  <app-page-header
+    [title]="tenant() ? ('Users — ' + tenant()!.tenantName) : 'Users'"
+    subtitle="Platform admin user management for the selected tenant."
+  >
+    @if (tenantId(); as id) {
+      <a class="btn btn--ghost" [routerLink]="['/admin/tenants', id]">Back to tenant</a>
+      <a class="btn btn--primary" [routerLink]="['/admin/tenants', id, 'users', 'new']">Add user</a>
+    }
+  </app-page-header>
+
+  <app-ui-card title="User list">
+    <label class="form-field" style="max-width: 20rem; margin-bottom: 1rem">
+      <span class="form-label">Search</span>
+      <input
+        class="form-input"
+        type="search"
+        [formControl]="searchControl"
+        placeholder="Username, name, email…"
+      />
+    </label>
+
+    @if (errorMessage()) {
+      <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+    }
+    @if (successMessage()) {
+      <div class="alert alert--success" role="status">{{ successMessage() }}</div>
+    }
+
+    @if (loading()) {
+      <app-loading-indicator label="Loading users…" />
+    } @else if (filteredUsers().length === 0) {
+      <app-empty-state title="No users found" message="Try adjusting search or add a user.">
+        <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+      </app-empty-state>
+    } @else {
+      @if (tenantId(); as id) {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th>Roles</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of filteredUsers(); track user.userId) {
+              <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.firstName }} {{ user.lastName || '' }}</td>
+                <td>{{ user.email || '—' }}</td>
+                <td>
+                  <span
+                    class="status-pill"
+                    [class.status-pill--active]="user.isActive"
+                    [class.status-pill--inactive]="!user.isActive"
+                  >
+                    {{ user.status }}
+                  </span>
+                </td>
+                <td>{{ roleSummary(user) }}</td>
+                <td class="data-table__actions">
+                  <a class="btn btn--secondary btn--compact" [routerLink]="['/admin/tenants', id, 'users', user.userId]">View</a>
+                  <a class="btn btn--secondary btn--compact" [routerLink]="['/admin/tenants', id, 'users', user.userId, 'edit']">Edit</a>
+                  <a class="btn btn--secondary btn--compact" [routerLink]="['/admin/tenants', id, 'users', user.userId, 'roles']">Roles</a>
+                  <button
+                    type="button"
+                    class="btn btn--secondary btn--compact"
+                    [disabled]="statusBusyId() === user.userId"
+                    (click)="toggleStatus(user)"
+                  >
+                    {{ user.isActive ? 'Deactivate' : 'Activate' }}
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      }
+    }
+  </app-ui-card>
+</section>

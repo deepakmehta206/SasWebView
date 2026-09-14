@@ -1,0 +1,117 @@
+<section class="page">
+  <app-page-header
+    [title]="isEdit() ? 'Edit user' : 'Add user'"
+    subtitle="User profile for the selected tenant. Tenant is taken from the route."
+  >
+    @if (tenantId(); as id) {
+      <a class="btn btn--secondary" [routerLink]="['/admin/tenants', id, 'users']">Back</a>
+    }
+  </app-page-header>
+
+  @if (loading()) {
+    <app-loading-indicator label="Loading user…" />
+  } @else if (loadFailed()) {
+    <app-empty-state title="User unavailable" [message]="errorMessage() || 'Unable to load user.'" />
+  } @else {
+    <app-ui-card title="User details">
+      @if (errorMessage()) {
+        <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+      }
+      @if (form.errors?.['passwordsMismatch'] && form.touched) {
+        <div class="alert alert--danger" role="alert">Password and confirmation must match.</div>
+      }
+      @if (fieldErrors().length) {
+        <ul class="alert alert--danger alert--list" role="alert">
+          @for (item of fieldErrors(); track item.code + item.message) {
+            <li>{{ item.code }}: {{ item.message }}</li>
+          }
+        </ul>
+      }
+
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="save()" novalidate>
+        <label class="form-field">
+          <span class="form-label">Username *</span>
+          <input class="form-input" type="text" formControlName="username" autocomplete="off" />
+        </label>
+        @if (!isEdit()) {
+          <label class="form-field">
+            <span class="form-label">Password *</span>
+            <input class="form-input" type="password" formControlName="password" autocomplete="new-password" />
+          </label>
+          <label class="form-field">
+            <span class="form-label">Confirm password *</span>
+            <input class="form-input" type="password" formControlName="confirmPassword" autocomplete="new-password" />
+          </label>
+        }
+        <label class="form-field">
+          <span class="form-label">First name *</span>
+          <input class="form-input" type="text" formControlName="firstName" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Last name</span>
+          <input class="form-input" type="text" formControlName="lastName" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Email</span>
+          <input class="form-input" type="email" formControlName="email" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Phone</span>
+          <input class="form-input" type="text" formControlName="phone" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Default branch</span>
+          <select class="form-input" formControlName="defaultBranchId">
+            <option value="">None</option>
+            @for (branch of branches(); track branch.branchId) {
+              <option [value]="branch.branchId">{{ branch.branchName }} ({{ branch.branchCode }})</option>
+            }
+          </select>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Status *</span>
+          <select class="form-input" formControlName="status">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </label>
+
+        @if (!isEdit()) {
+          <div class="form-field--full role-block" formArrayName="roleAssignments">
+            <div class="role-block__header">
+              <h3>Roles</h3>
+              <button type="button" class="btn btn--secondary btn--compact" (click)="addRoleRow()">Add role</button>
+            </div>
+            <p class="muted">PLATFORM_ADMIN is not assignable. Leave branch empty for tenant-wide assignment.</p>
+            @for (group of roleAssignments.controls; track $index; let i = $index) {
+              <div class="role-row" [formGroupName]="i">
+                <select class="form-input" formControlName="roleId">
+                  <option value="">Select role</option>
+                  @for (role of roles(); track role.roleId) {
+                    <option [value]="role.roleId">{{ role.roleName }} ({{ role.roleCode }})</option>
+                  }
+                </select>
+                <select class="form-input" formControlName="branchId">
+                  <option value="">Tenant-wide</option>
+                  @for (branch of branches(); track branch.branchId) {
+                    <option [value]="branch.branchId">{{ branch.branchName }}</option>
+                  }
+                </select>
+                <button type="button" class="btn btn--secondary btn--compact" (click)="removeRoleRow(i)">Remove</button>
+              </div>
+            }
+          </div>
+        }
+
+        <div class="form-actions form-field--full">
+          <button type="submit" class="btn btn--primary" [disabled]="saving()">
+            {{ saving() ? 'Saving…' : isEdit() ? 'Save changes' : 'Create user' }}
+          </button>
+          @if (tenantId(); as id) {
+            <a class="btn btn--secondary" [routerLink]="['/admin/tenants', id, 'users']">Cancel</a>
+          }
+        </div>
+      </form>
+    </app-ui-card>
+  }
+</section>

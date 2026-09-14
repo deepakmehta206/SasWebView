@@ -41,6 +41,8 @@ export class AuthStateService {
     return null;
   });
 
+  readonly isPlatformAdmin = computed(() => this.currentUserSignal()?.isPlatformAdmin === true);
+
   readonly displayName = computed(() => {
     const user = this.currentUserSignal();
     if (!user) {

@@ -1,0 +1,45 @@
+<section class="page">
+  <app-page-header title="User details" subtitle="View user profile and assigned roles for the selected tenant.">
+    @if (tenantId(); as id) {
+      <a class="btn btn--secondary" [routerLink]="['/admin/tenants', id, 'users']">Back</a>
+      @if (user(); as current) {
+        <a class="btn btn--primary" [routerLink]="['/admin/tenants', id, 'users', current.userId, 'edit']">Edit</a>
+        <a class="btn btn--secondary" [routerLink]="['/admin/tenants', id, 'users', current.userId, 'roles']">Roles</a>
+      }
+    }
+  </app-page-header>
+
+  @if (loading()) {
+    <app-loading-indicator label="Loading user…" />
+  } @else if (!user()) {
+    <app-empty-state title="User unavailable" [message]="errorMessage() || 'User not found.'" />
+  } @else {
+    @if (errorMessage()) {
+      <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+    }
+    <app-ui-card title="Profile">
+      <dl class="detail-grid">
+        <div><dt>Username</dt><dd>{{ user()!.username }}</dd></div>
+        <div><dt>Name</dt><dd>{{ user()!.firstName }} {{ user()!.lastName || '' }}</dd></div>
+        <div><dt>Email</dt><dd>{{ user()!.email || '—' }}</dd></div>
+        <div><dt>Phone</dt><dd>{{ user()!.phone || '—' }}</dd></div>
+        <div><dt>Default branch</dt><dd>{{ user()!.defaultBranchId ?? '—' }}</dd></div>
+        <div><dt>Status</dt><dd>{{ user()!.status }} ({{ user()!.isActive ? 'Active' : 'Inactive' }})</dd></div>
+      </dl>
+    </app-ui-card>
+    <app-ui-card title="Roles">
+      @if (user()!.roles.length === 0) {
+        <p>No roles assigned.</p>
+      } @else {
+        <ul class="role-list">
+          @for (role of user()!.roles; track role.roleId + '-' + (role.branchId ?? 't')) {
+            <li>
+              <strong>{{ role.roleName }}</strong> ({{ role.roleCode }})
+              — {{ role.branchId == null ? 'Tenant-wide' : ('Branch ' + role.branchId) }}
+            </li>
+          }
+        </ul>
+      }
+    </app-ui-card>
+  }
+</section>

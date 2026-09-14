@@ -1,0 +1,56 @@
+<section class="page">
+  <app-page-header
+    [title]="role() ? ('Permissions — ' + role()!.roleName) : 'Role permissions'"
+    subtitle="Assign permissions from the platform catalog. PLATFORM_ADMIN is never assignable."
+  >
+    @if (tenantId(); as id) {
+      <a class="btn btn--secondary" [routerLink]="['/admin/tenants', id, 'roles']">Back</a>
+    }
+  </app-page-header>
+
+  @if (loading()) {
+    <app-loading-indicator label="Loading permissions…" />
+  } @else if (loadFailed()) {
+    <app-empty-state title="Permissions unavailable" [message]="errorMessage() || 'Unable to load.'" />
+  } @else {
+    <app-ui-card title="Permission matrix">
+      @if (errorMessage()) {
+        <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+      }
+      @if (successMessage()) {
+        <div class="alert alert--success" role="status">{{ successMessage() }}</div>
+      }
+      @if (locked()) {
+        <div class="alert alert--danger" role="alert">System roles are locked.</div>
+      }
+
+      @for (group of grouped(); track group.moduleId) {
+        <div class="module-block">
+          <h3>{{ group.moduleName }}</h3>
+          <div class="perm-grid">
+            @for (permission of group.permissions; track permission.permissionId) {
+              <label class="perm-item">
+                <input
+                  type="checkbox"
+                  [checked]="isSelected(permission.permissionId)"
+                  [disabled]="locked()"
+                  (change)="toggle(permission.permissionId, $any($event.target).checked)"
+                />
+                <span>
+                  <strong>{{ permission.permissionCode }}</strong>
+                  <small>{{ permission.permissionName }}</small>
+                </span>
+              </label>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="form-actions">
+        <button type="button" class="btn btn--primary" [disabled]="saving() || locked()" (click)="save()">
+          {{ saving() ? 'Saving…' : 'Save permissions' }}
+        </button>
+      </div>
+    </app-ui-card>
+  }
+</section>

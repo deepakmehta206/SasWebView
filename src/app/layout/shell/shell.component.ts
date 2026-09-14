@@ -38,6 +38,66 @@ export class ShellComponent {
   }
 
   private resolveTitle(url: string): string {
+    if (url.startsWith('/admin/tenants/new')) {
+      return 'Provision tenant';
+    }
+
+    if (url.includes('/admin/tenants/') && url.includes('/users/') && url.endsWith('/roles')) {
+      return 'User roles';
+    }
+
+    if (url.includes('/admin/tenants/') && url.includes('/users/') && url.endsWith('/edit')) {
+      return 'Edit user';
+    }
+
+    if (url.includes('/admin/tenants/') && url.endsWith('/users/new')) {
+      return 'Add user';
+    }
+
+    if (url.includes('/admin/tenants/') && url.includes('/users/')) {
+      return 'User details';
+    }
+
+    if (url.includes('/admin/tenants/') && url.endsWith('/users')) {
+      return 'Tenant users';
+    }
+
+    if (url.includes('/admin/tenants/') && url.includes('/roles/') && url.endsWith('/permissions')) {
+      return 'Role permissions';
+    }
+
+    if (url.includes('/admin/tenants/') && url.includes('/roles/') && url.endsWith('/edit')) {
+      return 'Edit role';
+    }
+
+    if (url.includes('/admin/tenants/') && url.endsWith('/roles/new')) {
+      return 'Add role';
+    }
+
+    if (url.includes('/admin/tenants/') && url.endsWith('/roles')) {
+      return 'Tenant roles';
+    }
+
+    if (url.includes('/admin/tenants/') && url.endsWith('/edit')) {
+      return 'Edit tenant';
+    }
+
+    if (url.startsWith('/admin/tenants/')) {
+      return 'Tenant';
+    }
+
+    if (url.startsWith('/admin/tenants')) {
+      return 'Tenants';
+    }
+
+    if (url.startsWith('/admin/audit')) {
+      return 'Platform audit';
+    }
+
+    if (url.startsWith('/admin')) {
+      return 'Admin';
+    }
+
     if (url.startsWith('/dashboard')) {
       return 'Dashboard';
     }

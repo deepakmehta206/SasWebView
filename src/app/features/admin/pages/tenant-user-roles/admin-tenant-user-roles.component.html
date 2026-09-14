@@ -1,0 +1,55 @@
+<section class="page">
+  <app-page-header
+    [title]="user() ? ('Roles — ' + user()!.username) : 'User roles'"
+    subtitle="Replace all role assignments for this tenant user. PLATFORM_ADMIN is not assignable."
+  >
+    @if (tenantId(); as id) {
+      @if (userId(); as userId) {
+        <a class="btn btn--secondary" [routerLink]="['/admin/tenants', id, 'users', userId]">Back</a>
+      }
+    }
+  </app-page-header>
+
+  @if (loading()) {
+    <app-loading-indicator label="Loading roles…" />
+  } @else if (loadFailed()) {
+    <app-empty-state title="Roles unavailable" [message]="errorMessage() || 'Unable to load user roles.'" />
+  } @else {
+    <app-ui-card title="Assigned roles">
+      @if (errorMessage()) {
+        <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+      }
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="save()" novalidate>
+        <div class="form-field--full role-block" formArrayName="roleAssignments">
+          <div class="role-block__header">
+            <h3>Roles</h3>
+            <button type="button" class="btn btn--secondary btn--compact" (click)="addRoleRow()">Add role</button>
+          </div>
+          <p class="muted">Saving replaces the current assignments. TENANT_ADMIN may be assigned. Leave branch empty for tenant-wide.</p>
+          @for (group of roleAssignments.controls; track $index; let i = $index) {
+            <div class="role-row" [formGroupName]="i">
+              <select class="form-input" formControlName="roleId">
+                <option value="">Select role</option>
+                @for (role of roles(); track role.roleId) {
+                  <option [value]="role.roleId">{{ role.roleName }} ({{ role.roleCode }})</option>
+                }
+              </select>
+              <select class="form-input" formControlName="branchId">
+                <option value="">Tenant-wide</option>
+                @for (branch of branches(); track branch.branchId) {
+                  <option [value]="branch.branchId">{{ branch.branchName }}</option>
+                }
+              </select>
+              <button type="button" class="btn btn--secondary btn--compact" (click)="removeRoleRow(i)">Remove</button>
+            </div>
+          }
+        </div>
+        <div class="form-actions form-field--full">
+          <button type="submit" class="btn btn--primary" [disabled]="saving()">
+            {{ saving() ? 'Saving…' : 'Save roles' }}
+          </button>
+        </div>
+      </form>
+    </app-ui-card>
+  }
+</section>

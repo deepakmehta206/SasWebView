@@ -1,7 +1,9 @@
 <section class="page">
   <app-page-header title="Tenant" subtitle="Platform tenant overview and subscription summary.">
-    <a class="btn btn--ghost" routerLink="/admin/tenants">Back to tenants</a>
+      <a class="btn btn--ghost" routerLink="/admin/tenants">Back to tenants</a>
     @if (tenant(); as current) {
+      <a class="btn btn--secondary" [routerLink]="['/admin/tenants', current.tenantId, 'users']">Users</a>
+      <a class="btn btn--secondary" [routerLink]="['/admin/tenants', current.tenantId, 'roles']">Roles</a>
       <a class="btn btn--secondary" [routerLink]="['/admin/tenants', current.tenantId, 'edit']">Edit</a>
       @if (canActivate(current.status, current.isActive)) {
         <button type="button" class="btn btn--secondary" [disabled]="acting()" (click)="activate()">Activate</button>

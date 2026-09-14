@@ -1,0 +1,6 @@
+.page { display: flex; flex-direction: column; gap: 1rem; }
+.detail-grid { display: grid; gap: 1rem; margin: 0; }
+.detail-grid dt { font-size: 0.75rem; text-transform: uppercase; color: var(--color-text-muted); }
+.detail-grid dd { margin: 0.2rem 0 0; font-weight: 600; }
+.role-list { margin: 0; padding-left: 1.1rem; }
+@media (min-width: 700px) { .detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
