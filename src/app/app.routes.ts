@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { ShellComponent } from './layout/shell/shell.component';
 import { authGuard, guestGuard } from './core/guards/auth.guard';
 import { permissionGuard } from './core/guards/permission.guard';
+import { platformAdminGuard } from './core/guards/platform-admin.guard';
 import { PermissionCodes } from './core/constants/permission-codes';
 
 export const routes: Routes = [
@@ -37,6 +38,13 @@ export const routes: Routes = [
         path: 'dashboard',
         loadChildren: () =>
           import('./features/dashboard/dashboard.routes').then((m) => m.DASHBOARD_ROUTES)
+      },
+      {
+        path: 'admin',
+        canActivate: [platformAdminGuard, permissionGuard],
+        data: { permission: PermissionCodes.PlatformAdmin },
+        loadChildren: () =>
+          import('./features/admin/admin.routes').then((m) => m.ADMIN_ROUTES)
       },
       {
         path: 'settings',

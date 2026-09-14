@@ -31,6 +31,8 @@ export function formatAuditCategoryLabel(category: string | null | undefined): s
       return 'Payroll';
     case 'SETTINGS':
       return 'Settings';
+    case 'PLATFORM':
+      return 'Platform';
     default:
       return category.trim();
   }
@@ -118,6 +120,8 @@ export function categoryPillModifier(category: string | null | undefined): strin
     case 'USER':
     case 'ROLE':
       return 'status-pill--user';
+    case 'PLATFORM':
+      return 'status-pill--security';
     default:
       return 'status-pill--accent';
   }

@@ -27,6 +27,7 @@ describe('audit-display.util', () => {
   it('formats category labels', () => {
     expect(formatAuditCategoryLabel('SECURITY')).toBe('Security');
     expect(formatAuditCategoryLabel('HRMS')).toBe('HRMS');
+    expect(formatAuditCategoryLabel('PLATFORM')).toBe('Platform');
     expect(formatAuditCategoryLabel(null)).toBe('—');
   });
 
@@ -54,5 +55,6 @@ describe('audit-display.util', () => {
     expect(categoryPillModifier('SECURITY')).toBe('status-pill--security');
     expect(categoryPillModifier('FILE')).toBe('status-pill--file');
     expect(categoryPillModifier('UNKNOWN')).toBe('status-pill--accent');
+    expect(categoryPillModifier('PLATFORM')).toBe('status-pill--security');
   });
 });

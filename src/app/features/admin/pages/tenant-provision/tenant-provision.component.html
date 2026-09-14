@@ -1,0 +1,256 @@
+<section class="page">
+  <app-page-header title="Provision tenant" subtitle="Create a tenant, admin, branch, plan, modules and features in one request.">
+    <a class="btn btn--ghost" routerLink="/admin/tenants">Cancel</a>
+  </app-page-header>
+
+  <ol class="steps">
+    @for (label of steps; track label; let i = $index) {
+      <li [class.steps__item--active]="step() === i" [class.steps__item--done]="step() > i">
+        <button type="button" class="steps__button" [disabled]="i > step()" (click)="goTo(i)">
+          <span class="steps__index">{{ i + 1 }}</span>
+          <span>{{ label }}</span>
+        </button>
+      </li>
+    }
+  </ol>
+
+  @if (errorMessage()) {
+    <div class="alert alert--danger" role="alert">
+      @if (errorCode()) {
+        <strong>{{ errorCode() }}:</strong>
+      }
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (catalogLoading() && step() >= 3) {
+    <app-loading-indicator label="Loading catalog…" />
+  }
+
+  <app-ui-card [title]="steps[step()]">
+    @if (step() === 0) {
+      <form class="form-grid" [formGroup]="tenantForm" novalidate>
+        <label class="form-field">
+          <span class="form-label">Tenant code *</span>
+          <input class="form-input" type="text" formControlName="tenantCode" autocomplete="off" />
+          @if (controlError('tenant', 'tenantCode'); as message) { <span class="form-error">{{ message }}</span> }
+        </label>
+        <label class="form-field">
+          <span class="form-label">Tenant name *</span>
+          <input class="form-input" type="text" formControlName="tenantName" />
+          @if (controlError('tenant', 'tenantName'); as message) { <span class="form-error">{{ message }}</span> }
+        </label>
+        <label class="form-field">
+          <span class="form-label">Tenant type *</span>
+          <select class="form-input" formControlName="tenantType">
+            @for (type of tenantTypes; track type) {
+              <option [value]="type">{{ type }}</option>
+            }
+          </select>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Email</span>
+          <input class="form-input" type="email" formControlName="email" />
+          @if (controlError('tenant', 'email'); as message) { <span class="form-error">{{ message }}</span> }
+        </label>
+        <label class="form-field">
+          <span class="form-label">Phone</span>
+          <input class="form-input" type="text" formControlName="phone" />
+        </label>
+        <label class="form-field form-field--full">
+          <span class="form-label">Address</span>
+          <textarea class="form-input" rows="3" formControlName="address"></textarea>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Time zone</span>
+          <input class="form-input" type="text" formControlName="timeZone" placeholder="e.g. Asia/Kolkata" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Currency</span>
+          <select class="form-input" formControlName="currencyCode">
+            <option value="">Select currency</option>
+            @for (currency of currencies(); track currency.currencyCode) {
+              <option [value]="currency.currencyCode">{{ currency.currencyCode }} — {{ currency.currencyName }}</option>
+            }
+          </select>
+        </label>
+      </form>
+    }
+
+    @if (step() === 1) {
+      <form class="form-grid" [formGroup]="adminForm" novalidate>
+        <label class="form-field">
+          <span class="form-label">Username *</span>
+          <input class="form-input" type="text" formControlName="username" autocomplete="off" />
+          @if (controlError('admin', 'username'); as message) { <span class="form-error">{{ message }}</span> }
+        </label>
+        <label class="form-field">
+          <span class="form-label">First name *</span>
+          <input class="form-input" type="text" formControlName="firstName" />
+          @if (controlError('admin', 'firstName'); as message) { <span class="form-error">{{ message }}</span> }
+        </label>
+        <label class="form-field">
+          <span class="form-label">Last name</span>
+          <input class="form-input" type="text" formControlName="lastName" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Email</span>
+          <input class="form-input" type="email" formControlName="email" />
+          @if (controlError('admin', 'email'); as message) { <span class="form-error">{{ message }}</span> }
+        </label>
+        <label class="form-field">
+          <span class="form-label">Password *</span>
+          <input class="form-input" type="password" formControlName="password" autocomplete="new-password" />
+          @if (controlError('admin', 'password'); as message) { <span class="form-error">{{ message }}</span> }
+        </label>
+        <label class="form-field">
+          <span class="form-label">Confirm password *</span>
+          <input class="form-input" type="password" formControlName="confirmPassword" autocomplete="new-password" />
+          @if (adminPasswordMismatch()) {
+            <span class="form-error">Password and confirmation must match.</span>
+          }
+        </label>
+      </form>
+    }
+
+    @if (step() === 2) {
+      <form class="form-grid" [formGroup]="branchForm" novalidate>
+        <label class="form-field">
+          <span class="form-label">Branch code *</span>
+          <input class="form-input" type="text" formControlName="branchCode" />
+          @if (controlError('branch', 'branchCode'); as message) { <span class="form-error">{{ message }}</span> }
+        </label>
+        <label class="form-field">
+          <span class="form-label">Branch name *</span>
+          <input class="form-input" type="text" formControlName="branchName" />
+          @if (controlError('branch', 'branchName'); as message) { <span class="form-error">{{ message }}</span> }
+        </label>
+        <label class="form-field form-field--full">
+          <span class="form-label">Address</span>
+          <textarea class="form-input" rows="3" formControlName="address"></textarea>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Phone</span>
+          <input class="form-input" type="text" formControlName="phone" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Email</span>
+          <input class="form-input" type="email" formControlName="email" />
+          @if (controlError('branch', 'email'); as message) { <span class="form-error">{{ message }}</span> }
+        </label>
+      </form>
+    }
+
+    @if (step() === 3) {
+      <form class="form-grid" [formGroup]="subscriptionForm" novalidate>
+        <label class="form-field form-field--full">
+          <span class="form-label">Plan *</span>
+          <select class="form-input" formControlName="planId">
+            <option [ngValue]="0" disabled>Select plan</option>
+            @for (plan of plans(); track plan.planId) {
+              <option [ngValue]="plan.planId">{{ plan.planCode }} — {{ plan.planName }}</option>
+            }
+          </select>
+          @if (controlError('subscription', 'planId'); as message) { <span class="form-error">{{ message }}</span> }
+        </label>
+        <label class="form-field">
+          <span class="form-label">Billing cycle *</span>
+          <select class="form-input" formControlName="billingCycle">
+            @for (cycle of billingCycles; track cycle) {
+              <option [value]="cycle">{{ cycle }}</option>
+            }
+          </select>
+        </label>
+        @if (selectedPlan(); as plan) {
+          <p class="hint form-field--full">
+            Trial days: {{ plan.trialDays }}. Trial is applied by the backend and is not sent in the request.
+          </p>
+        }
+      </form>
+    }
+
+    @if (step() === 4) {
+      <p class="hint">CORE is required and locked. Additional modules stay local until provision.</p>
+      <ul class="choice-list">
+        @for (module of modules(); track module.moduleId) {
+          <li>
+            <label class="choice">
+              <input
+                type="checkbox"
+                [checked]="isModuleSelected(module.moduleCode)"
+                [disabled]="isCoreModule(module.moduleCode)"
+                (change)="toggleModule(module.moduleCode, $any($event.target).checked)"
+              />
+              <span>
+                <strong>{{ module.moduleCode }}</strong>
+                — {{ module.moduleName }}
+                @if (isCoreModule(module.moduleCode)) {
+                  <em>(required)</em>
+                }
+              </span>
+            </label>
+          </li>
+        }
+      </ul>
+    }
+
+    @if (step() === 5) {
+      <p class="hint">Features are limited to selected modules and the selected plan. Backend remains authoritative.</p>
+      @if (!visibleFeatures().length) {
+        <p class="hint">No features available for the selected modules.</p>
+      } @else {
+        <ul class="choice-list">
+          @for (feature of visibleFeatures(); track feature.featureId) {
+            <li>
+              <label class="choice" [class.choice--disabled]="!isFeatureAllowedByPlan(feature.featureCode, selectedPlan()?.features)">
+                <input
+                  type="checkbox"
+                  [checked]="isFeatureSelected(feature.featureCode)"
+                  [disabled]="!isFeatureAllowedByPlan(feature.featureCode, selectedPlan()?.features)"
+                  (change)="toggleFeature(feature.featureCode, $any($event.target).checked)"
+                />
+                <span>
+                  <strong>{{ feature.featureCode }}</strong>
+                  — {{ feature.featureName }}
+                  <small>({{ feature.moduleCode }})</small>
+                  @if (!isFeatureAllowedByPlan(feature.featureCode, selectedPlan()?.features)) {
+                    <em>Not allowed by plan</em>
+                  }
+                </span>
+              </label>
+            </li>
+          }
+        </ul>
+      }
+    }
+
+    @if (step() === 6 || step() === 7) {
+      @if (review(); as request) {
+        <dl class="detail-list">
+          <div><dt>Tenant</dt><dd>{{ request.tenant.tenantCode }} — {{ request.tenant.tenantName }} ({{ request.tenant.tenantType }})</dd></div>
+          <div><dt>Admin</dt><dd>{{ request.admin.username }} — {{ request.admin.firstName }} {{ request.admin.lastName || '' }}</dd></div>
+          <div><dt>Branch</dt><dd>{{ request.branch.branchCode }} — {{ request.branch.branchName }}</dd></div>
+          <div>
+            <dt>Plan</dt>
+            <dd>{{ selectedPlan()?.planName || request.subscription.planId }} / {{ request.subscription.billingCycle }}</dd>
+          </div>
+          <div><dt>Modules</dt><dd>{{ request.moduleCodes.join(', ') }}</dd></div>
+          <div><dt>Features</dt><dd>{{ request.featureCodes.length ? request.featureCodes.join(', ') : '—' }}</dd></div>
+        </dl>
+      }
+    }
+
+    <div class="form-actions">
+      @if (step() > 0) {
+        <button type="button" class="btn btn--secondary" (click)="back()" [disabled]="submitting()">Back</button>
+      }
+      @if (step() < 7) {
+        <button type="button" class="btn btn--primary" (click)="next()">Next</button>
+      } @else {
+        <button type="button" class="btn btn--primary" (click)="provision()" [disabled]="submitting()">
+          {{ submitting() ? 'Provisioning…' : 'Provision' }}
+        </button>
+      }
+    </div>
+  </app-ui-card>
+</section>

@@ -1,0 +1,79 @@
+<section class="page">
+  <app-page-header title="Tenant" subtitle="Platform tenant overview and subscription summary.">
+    <a class="btn btn--ghost" routerLink="/admin/tenants">Back to tenants</a>
+    @if (tenant(); as current) {
+      <a class="btn btn--secondary" [routerLink]="['/admin/tenants', current.tenantId, 'edit']">Edit</a>
+      @if (canActivate(current.status, current.isActive)) {
+        <button type="button" class="btn btn--secondary" [disabled]="acting()" (click)="activate()">Activate</button>
+      }
+      @if (canSuspend(current.status, current.isActive)) {
+        <button type="button" class="btn btn--secondary" [disabled]="acting()" (click)="suspend()">Suspend</button>
+      }
+    }
+  </app-page-header>
+
+  @if (errorMessage()) {
+    <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+  }
+
+  @if (loading()) {
+    <app-loading-indicator label="Loading tenant…" />
+  } @else if (!tenant()) {
+    <app-empty-state title="Tenant unavailable" [message]="errorMessage() || 'Tenant was not found.'">
+      <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+    </app-empty-state>
+  } @else {
+    @if (tenant(); as current) {
+      <app-ui-card title="Tenant">
+        <dl class="detail-list">
+          <div><dt>Tenant code</dt><dd>{{ current.tenantCode }}</dd></div>
+          <div><dt>Tenant name</dt><dd>{{ current.tenantName }}</dd></div>
+          <div><dt>Type</dt><dd>{{ formatType(current.tenantType) }}</dd></div>
+          <div>
+            <dt>Status</dt>
+            <dd>
+              <span [class]="statusClass(current.status, current.isActive)">
+                {{ formatStatus(current.status) }}
+              </span>
+            </dd>
+          </div>
+          <div><dt>Created</dt><dd>{{ formatDate(current.createdDate) }}</dd></div>
+        </dl>
+      </app-ui-card>
+
+      <app-ui-card title="Contact">
+        <dl class="detail-list">
+          <div><dt>Email</dt><dd>{{ dash(current.email) }}</dd></div>
+          <div><dt>Phone</dt><dd>{{ dash(current.phone) }}</dd></div>
+          <div><dt>Address</dt><dd>{{ dash(current.address) }}</dd></div>
+          <div><dt>Time zone</dt><dd>{{ dash(current.timeZone) }}</dd></div>
+          <div><dt>Currency</dt><dd>{{ dash(current.currencyCode) }}</dd></div>
+        </dl>
+      </app-ui-card>
+
+      <app-ui-card title="Subscription">
+        <dl class="detail-list">
+          <div><dt>Plan</dt><dd>{{ dash(current.planName ?? current.planCode) }}</dd></div>
+          <div><dt>Billing cycle</dt><dd>{{ dash(current.billingCycle) }}</dd></div>
+          <div><dt>Status</dt><dd>{{ formatSubscription(current.subscriptionStatus) }}</dd></div>
+          <div>
+            <dt>Start date</dt>
+            <dd>{{ current.subscriptionStartDate ? (current.subscriptionStartDate | date: 'mediumDate') : '—' }}</dd>
+          </div>
+          <div>
+            <dt>End date</dt>
+            <dd>{{ current.subscriptionEndDate ? (current.subscriptionEndDate | date: 'mediumDate') : '—' }}</dd>
+          </div>
+          <div>
+            <dt>Trial start</dt>
+            <dd>{{ current.trialStartDate ? (current.trialStartDate | date: 'mediumDate') : '—' }}</dd>
+          </div>
+          <div>
+            <dt>Trial end</dt>
+            <dd>{{ current.trialEndDate ? (current.trialEndDate | date: 'mediumDate') : '—' }}</dd>
+          </div>
+        </dl>
+      </app-ui-card>
+    }
+  }
+</section>

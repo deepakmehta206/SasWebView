@@ -1,0 +1,80 @@
+<section class="page">
+  <app-page-header title="Tenants" subtitle="Platform tenant list and lifecycle.">
+    <a class="btn btn--primary" routerLink="/admin/tenants/new">Provision tenant</a>
+    <button type="button" class="btn btn--ghost" (click)="load()" [disabled]="loading()">Refresh</button>
+  </app-page-header>
+
+  <app-ui-card title="All tenants">
+    @if (errorMessage()) {
+      <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+    }
+
+    @if (loading() && rows().length === 0) {
+      <app-loading-indicator label="Loading tenants…" />
+    } @else if (!rows().length) {
+      <app-empty-state title="No tenants" message="Provision a tenant to get started.">
+        <a class="btn btn--primary" routerLink="/admin/tenants/new">Provision tenant</a>
+      </app-empty-state>
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th scope="col">Tenant Code</th>
+              <th scope="col">Tenant Name</th>
+              <th scope="col">Tenant Type</th>
+              <th scope="col">Status</th>
+              <th scope="col">Email</th>
+              <th scope="col">Plan</th>
+              <th scope="col">Subscription Status</th>
+              <th scope="col">Created</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.tenantId) {
+              <tr>
+                <td>{{ row.tenantCode }}</td>
+                <td>{{ row.tenantName }}</td>
+                <td>{{ formatType(row.tenantType) }}</td>
+                <td>
+                  <span [class]="statusClass(row.status, row.isActive)">
+                    {{ formatStatus(row.status) }}
+                  </span>
+                </td>
+                <td>{{ dash(row.email) }}</td>
+                <td>{{ dash(row.planName ?? row.planCode) }}</td>
+                <td>{{ formatSubscription(row.subscriptionStatus) }}</td>
+                <td>{{ formatDate(row.createdDate) }}</td>
+                <td class="data-table__actions">
+                  <a class="btn btn--ghost btn--sm" [routerLink]="['/admin/tenants', row.tenantId]">View</a>
+                  <a class="btn btn--ghost btn--sm" [routerLink]="['/admin/tenants', row.tenantId, 'edit']">Edit</a>
+                  @if (canActivate(row.status, row.isActive)) {
+                    <button
+                      type="button"
+                      class="btn btn--secondary btn--sm"
+                      [disabled]="statusBusyId() === row.tenantId"
+                      (click)="activate(row)"
+                    >
+                      Activate
+                    </button>
+                  }
+                  @if (canSuspend(row.status, row.isActive)) {
+                    <button
+                      type="button"
+                      class="btn btn--secondary btn--sm"
+                      [disabled]="statusBusyId() === row.tenantId"
+                      (click)="suspend(row)"
+                    >
+                      Suspend
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-ui-card>
+</section>

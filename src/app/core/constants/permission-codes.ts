@@ -20,6 +20,8 @@ export const PermissionCodes = {
   TenantAdd: 'TENANT_ADD',
   TenantEdit: 'TENANT_EDIT',
 
+  PlatformAdmin: 'PLATFORM_ADMIN',
+
   ModuleView: 'MODULE_VIEW',
   ModuleAdd: 'MODULE_ADD',
   ModuleEdit: 'MODULE_EDIT',

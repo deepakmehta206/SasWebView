@@ -1,0 +1,98 @@
+<section class="page">
+  <app-page-header title="Edit tenant" subtitle="Update platform-managed tenant fields.">
+    @if (tenant(); as current) {
+      <a class="btn btn--ghost" [routerLink]="['/admin/tenants', current.tenantId]">Back</a>
+    } @else {
+      <a class="btn btn--ghost" routerLink="/admin/tenants">Back to tenants</a>
+    }
+  </app-page-header>
+
+  @if (loading()) {
+    <app-loading-indicator label="Loading tenant…" />
+  } @else if (!tenant()) {
+    <app-empty-state title="Tenant unavailable" [message]="errorMessage() || 'Tenant was not found.'">
+      <button type="button" class="btn btn--secondary" (click)="load()">Retry</button>
+    </app-empty-state>
+  } @else {
+    <app-ui-card title="Tenant details" subtitle="Required fields are marked with *.">
+      @if (errorMessage()) {
+        <div class="alert alert--danger" role="alert">{{ errorMessage() }}</div>
+      }
+      @if (fieldErrors().length) {
+        <ul class="alert alert--danger alert--list" role="alert">
+          @for (item of fieldErrors(); track item.code + item.message) {
+            <li>{{ item.code }}: {{ item.message }}</li>
+          }
+        </ul>
+      }
+
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="save()" novalidate>
+        <label class="form-field">
+          <span class="form-label">Tenant code *</span>
+          <input class="form-input" type="text" formControlName="tenantCode" autocomplete="off" />
+          @if (controlError('tenantCode'); as message) {
+            <span class="form-error">{{ message }}</span>
+          }
+        </label>
+        <label class="form-field">
+          <span class="form-label">Tenant name *</span>
+          <input class="form-input" type="text" formControlName="tenantName" />
+          @if (controlError('tenantName'); as message) {
+            <span class="form-error">{{ message }}</span>
+          }
+        </label>
+        <label class="form-field">
+          <span class="form-label">Tenant type *</span>
+          <select class="form-input" formControlName="tenantType">
+            @for (type of tenantTypes; track type) {
+              <option [value]="type">{{ type }}</option>
+            }
+          </select>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Status *</span>
+          <select class="form-input" formControlName="status">
+            @for (status of statusOptions; track status) {
+              <option [value]="status">{{ status }}</option>
+            }
+          </select>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Email</span>
+          <input class="form-input" type="email" formControlName="email" />
+          @if (controlError('email'); as message) {
+            <span class="form-error">{{ message }}</span>
+          }
+        </label>
+        <label class="form-field">
+          <span class="form-label">Phone</span>
+          <input class="form-input" type="text" formControlName="phone" />
+        </label>
+        <label class="form-field form-field--full">
+          <span class="form-label">Address</span>
+          <textarea class="form-input" rows="3" formControlName="address"></textarea>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Time zone</span>
+          <input class="form-input" type="text" formControlName="timeZone" placeholder="e.g. Asia/Kolkata" />
+        </label>
+        <label class="form-field">
+          <span class="form-label">Currency</span>
+          <select class="form-input" formControlName="currencyCode">
+            <option value="">Select currency</option>
+            @for (currency of currencies(); track currency.currencyCode) {
+              <option [value]="currency.currencyCode">
+                {{ currency.currencyCode }} — {{ currency.currencyName }}
+              </option>
+            }
+          </select>
+        </label>
+        <div class="form-actions form-field--full">
+          <button type="submit" class="btn btn--primary" [disabled]="saving()">
+            {{ saving() ? 'Saving…' : 'Save changes' }}
+          </button>
+        </div>
+      </form>
+    </app-ui-card>
+  }
+</section>

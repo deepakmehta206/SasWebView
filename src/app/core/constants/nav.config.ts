@@ -3,6 +3,7 @@ import { PermissionCodes } from './permission-codes';
 import { FeatureCodes, ModuleCodes } from './feature-codes';
 import { PermissionService } from '../permissions/permission.service';
 import { FeatureAccessService } from '../entitlements/feature-access.service';
+import { AuthStateService } from '../auth/auth-state.service';
 
 export interface NavItem {
   label: string;
@@ -22,6 +23,11 @@ export interface NavItem {
    * Evaluated only after module/feature checks pass.
    */
   anyPermissions?: readonly string[];
+  /**
+   * Platform SaaS Admin items. Hidden unless currentUser.isPlatformAdmin.
+   * Do not use TENANT_VIEW for this — TENANT_ADMIN has TENANT_VIEW.
+   */
+  requirePlatformAdmin?: boolean;
   children?: NavItem[];
 }
 
@@ -36,6 +42,27 @@ export const SIDEBAR_NAV_ITEMS: readonly NavItem[] = [
     route: '/dashboard',
     icon: 'dashboard',
     enabled: true
+  },
+  {
+    label: 'Admin',
+    route: '/admin',
+    icon: 'admin',
+    enabled: true,
+    requirePlatformAdmin: true,
+    children: [
+      {
+        label: 'Tenants',
+        route: '/admin/tenants',
+        enabled: true,
+        requirePlatformAdmin: true
+      },
+      {
+        label: 'Audit',
+        route: '/admin/audit',
+        enabled: true,
+        requirePlatformAdmin: true
+      }
+    ]
   },
   {
     label: 'Users',
@@ -322,9 +349,11 @@ export const SIDEBAR_NAV_ITEMS: readonly NavItem[] = [
 export class NavigationService {
   private readonly permissions = inject(PermissionService);
   private readonly featureAccess = inject(FeatureAccessService);
+  private readonly authState = inject(AuthStateService);
 
   /**
    * Evaluation order (approved):
+   * - requirePlatformAdmin must pass (platform SaaS Admin only)
    * - moduleCode / featureCode must pass (even for Soon items)
    * - enabled === false → show as Soon (caller renders badge)
    * - enabled === true → permission check → visible
@@ -333,6 +362,7 @@ export class NavigationService {
   getVisibleNavItems(source: readonly NavItem[] = SIDEBAR_NAV_ITEMS): NavItem[] {
     this.permissions.permissions();
     this.featureAccess.modules();
+    this.authState.currentUser();
 
     return source
       .map((item) => this.filterItem(item))
@@ -348,6 +378,10 @@ export class NavigationService {
   }
 
   private filterItem(item: NavItem): NavItem | null {
+    if (item.requirePlatformAdmin && this.authState.currentUser()?.isPlatformAdmin !== true) {
+      return null;
+    }
+
     if (item.moduleCode && !this.featureAccess.isModuleEnabled(item.moduleCode)) {
       return null;
     }

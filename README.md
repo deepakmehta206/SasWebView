@@ -20,8 +20,19 @@ npm start
 App: http://localhost:4200  
 API base (Phase 1): `https://localhost:7006/api/v1`
 
-## Notes
+## Phase 12B — Platform Admin UI
 
-- Backend remains authoritative for auth, tenancy, permissions, and entitlements.
-- Sidebar nav config: `src/app/core/constants/nav.config.ts`
-- Do not add authorization logic in the UI for Phase 1.
+Platform SaaS administration (Angular only). Backend `/api/v1/admin/*` remains the security boundary.
+
+Routes:
+
+- `/admin` → `/admin/tenants`
+- `/admin/tenants`
+- `/admin/tenants/new`
+- `/admin/tenants/:id`
+- `/admin/tenants/:id/edit`
+- `/admin/audit`
+
+Visibility requires `isPlatformAdmin`. Tenant users do not see Admin navigation.
+
+Do not store or document bootstrap passwords in the UI. The provisioned tenant admin password is entered in the wizard and is not the platform seed password.
